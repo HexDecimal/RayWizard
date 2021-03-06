@@ -23,6 +23,6 @@ class World:
         while self.player in self.map.actors:
             next_obj = self.map.schedule[0]
             next_obj.on_turn()
-            if self.map.schedule[0] is next_obj:
+            if self.map.schedule and self.map.schedule[0] is next_obj:
                 self.map.schedule.rotate(1)
         logger.info("Player is dead or missing!")

@@ -14,7 +14,7 @@ def render_main(console: tcod.console.Console) -> None:
     console_shape = (console.width - UI_SIZE[0], console.height - UI_SIZE[1])
     console.tiles_rgb[: console_shape[0], : console_shape[1]] = ord(" "), 0x40, 0x00  # Clear world area.
     screen_view, world_view = map_.camera.get_views((map_.width, map_.height), console_shape)
-    console.tiles_rgb["ch"][screen_view] = g.world.map.tiles["ch"][world_view]
+    console.tiles_rgb[screen_view] = g.world.map.tiles["dark"][world_view]
 
     # Render all actors.
     cam_x, cam_y = map_.camera.get_left_top_pos(console_shape)

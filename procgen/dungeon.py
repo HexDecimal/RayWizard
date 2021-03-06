@@ -2,25 +2,28 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Iterator, List, Tuple, Type
+from typing import Iterator, List, Tuple
 
 import numpy as np
 import tcod
 
-import map
+import engine.map
+import engine.world
 
-WALL = map.TILE(
+WALL = engine.map.Tile(
     move_cost=0,
     transparent=False,
     light=(ord(" "), (255, 255, 255), (130, 110, 50)),
     dark=(ord(" "), (255, 255, 255), (0, 0, 100)),
 )
-FLOOR = map.TILE(
+FLOOR = engine.map.Tile(
     move_cost=1,
     transparent=True,
     light=(ord(" "), (255, 255, 255), (200, 180, 50)),
     dark=(ord(" "), (255, 255, 255), (50, 50, 150)),
 )
+
+
 class Room:
     """Holds data and methods used to generate rooms."""
 
@@ -39,9 +42,7 @@ class Room:
     @property
     def inner(self) -> Tuple[slice, slice]:
         """Return the NumPy index for the inner room area."""
-        index: Tuple[slice, slice] = np.s_[
-            self.x1 + 1 : self.x2 - 1, self.y1 + 1 : self.y2 - 1
-        ]
+        index: Tuple[slice, slice] = np.s_[self.x1 + 1 : self.x2 - 1, self.y1 + 1 : self.y2 - 1]
         return index
 
     @property
@@ -51,12 +52,7 @@ class Room:
 
     def intersects(self, other: Room) -> bool:
         """Return True if this room intersects with another."""
-        return (
-            self.x1 <= other.x2
-            and self.x2 >= other.x1
-            and self.y1 <= other.y2
-            and self.y2 >= other.y1
-        )
+        return self.x1 <= other.x2 and self.x2 >= other.x1 and self.y1 <= other.y2 and self.y2 >= other.y1
 
     def distance_to(self, other: Room) -> float:
         """Return an approximate distance from this room to another."""
@@ -64,9 +60,7 @@ class Room:
         other_x, other_y = other.center
         return abs(other_x - x) + abs(other_y - y)
 
-    def get_free_spaces(
-        self, gamemap: gamemap.GameMap, number: int
-    ) -> Iterator[Tuple[int, int]]:
+    def get_free_spaces(self, gamemap: engine.map.Map, number: int) -> Iterator[Tuple[int, int]]:
         """Iterate over the x,y coordinates of up to `number` spaces."""
         for _ in range(number):
             x = random.randint(self.x1 + 1, self.x2 - 2)
@@ -75,17 +69,18 @@ class Room:
                 continue
             yield x, y
 
-def generate(model: Model, width: int = 80, height: int = 45) -> gamemap.GameMap:
+
+def generate(model: engine.world.World, width: int = 80, height: int = 45) -> engine.map.Map:
     """Return a randomly generated GameMap."""
     room_max_size = 10
     room_min_size = 6
     max_rooms = 30
 
-    gm = gamemap.GameMap(model, width, height)
+    gm = engine.map.Map(width, height)
     gm.tiles[...] = WALL
     rooms: List[Room] = []
 
-    for i in range(max_rooms):
+    for _ in range(max_rooms):
         # random width and height
         w = random.randint(room_min_size, room_max_size)
         h = random.randint(room_min_size, room_max_size)
@@ -97,7 +92,7 @@ def generate(model: Model, width: int = 80, height: int = 45) -> gamemap.GameMap
             continue  # This room intersects with a previous room.
 
         # Mark room inner area as open.
-        gm.tiles.T[new_room.inner] = FLOOR
+        gm.tiles[new_room.inner] = FLOOR
         if rooms:
             # Open a tunnel between rooms.
             if random.randint(0, 99) < 80:
@@ -112,15 +107,12 @@ def generate(model: Model, width: int = 80, height: int = 45) -> gamemap.GameMap
                 t_middle = t_start[0], t_end[1]
             else:
                 t_middle = t_end[0], t_start[1]
-            gm.tiles.T[tcod.line_where(*t_start, *t_middle)] = FLOOR
-            gm.tiles.T[tcod.line_where(*t_middle, *t_end)] = FLOOR
+            gm.tiles[tcod.line_where(*t_start, *t_middle)] = FLOOR
+            gm.tiles[tcod.line_where(*t_middle, *t_end)] = FLOOR
         rooms.append(new_room)
 
     # Add player to the first room.
-    gm.player = races.common.Player.spawn(gm[rooms[0].center], ai_cls=ai.PlayerControl)
+    model.player = engine.actor.Actor(*rooms[0].center)
+    gm.add_actor(model.player)
 
-    for room in rooms:
-        room.place_entities(gm)
-
-    gm.update_fov()
     return gm

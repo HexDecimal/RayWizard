@@ -15,6 +15,7 @@ import engine.actor
 import engine.states
 import engine.world
 import g
+import procgen.dungeon
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
@@ -24,10 +25,7 @@ def main() -> None:
     with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset) as g.context:
         g.world = engine.world.World()
 
-        g.world.player = engine.actor.Actor(0, 0)
-        g.world.map.add_actor(g.world.player)
-
-        g.world.map.add_actor(engine.actor.Actor(5, 5))  # Dummy actor.
+        g.world.map = procgen.dungeon.generate(g.world)
 
         g.world.loop()
 

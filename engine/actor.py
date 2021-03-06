@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 
+import engine.map
 import engine.states
 import g
 from engine.sched import Schedulable
@@ -20,6 +21,7 @@ class Actor(Schedulable):
     def on_turn(self) -> None:
         if self is g.world.player:
             logger.info("Player turn")
+            g.world.map.camera = engine.map.Camera(self.x, self.y)
             engine.states.InGame().run_modal()
             return
         logger.info(f"Non-Player turn: {self}")

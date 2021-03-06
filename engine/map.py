@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import collections
-from typing import Deque, Set
+from typing import Deque, NamedTuple, Set, Tuple
 
 import numpy as np
 
@@ -10,6 +10,49 @@ import engine.actor
 import engine.sched
 
 TILE_DT = np.dtype([("ch", np.int32)])
+
+
+class Camera(NamedTuple):
+    """An object for tracking the camera position and for screen/world conversions.
+
+    `x` and `y` are the camera center position.
+    """
+
+    x: int
+    y: int
+
+    def get_left_top_pos(self, screen_shape: Tuple[int, int]) -> Tuple[int, int]:
+        """Return the (left, top) position of the camera for a screen of this size."""
+        return self.x - screen_shape[0] // 2, self.y - screen_shape[1] // 2
+
+    def get_views(
+        self, world_shape: Tuple[int, int], screen_shape: Tuple[int, int]
+    ) -> Tuple[Tuple[slice, slice], Tuple[slice, slice]]:
+        """Return (screen_view, world_view) as 2D slices for use with NumPy.
+
+        These views are used to slice their respective arrays.
+        """
+        camera_left, camera_top = self.get_left_top_pos(screen_shape)
+
+        screen_left = max(0, -camera_left)
+        screen_top = max(0, -camera_top)
+
+        world_left = max(0, camera_left)
+        world_top = max(0, camera_top)
+
+        screen_width = min(screen_shape[0] - screen_left, world_shape[0] - world_left)
+        screen_height = min(screen_shape[1] - screen_top, world_shape[1] - world_top)
+
+        screen_view: Tuple[slice, slice] = np.s_[
+            screen_left : screen_left + screen_width,
+            screen_top : screen_top + screen_height,
+        ]
+        world_view: Tuple[slice, slice] = np.s_[
+            world_left : world_left + screen_width,
+            world_top : world_top + screen_height,
+        ]
+
+        return screen_view, world_view
 
 
 class Map:
@@ -21,6 +64,7 @@ class Map:
         self.tiles = np.full((width, height), ord("."), TILE_DT, order="F")
         self.actors: Set[engine.actor.Actor] = set()
         self.schedule: Deque[engine.sched.Schedulable] = collections.deque()
+        self.camera = Camera(0, 0)
 
     def add_actor(self, actor: engine.actor.Actor) -> None:
         assert actor not in self.actors

@@ -22,4 +22,4 @@ def render_main(console: tcod.console.Console) -> None:
         x = actor.x - cam_x
         y = actor.y - cam_y
         if 0 <= x < console_shape[0] and 0 <= y < console_shape[1]:
-            console.print(x, y, "@", fg=(0xFF, 0xFF, 0xFF))
+            console.print(x, y, actor.ch, fg=actor.fg)

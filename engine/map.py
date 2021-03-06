@@ -9,7 +9,17 @@ import numpy as np
 import engine.actor
 import engine.sched
 
-TILE_DT = np.dtype([("ch", np.int32)])
+//TILE_DT = np.dtype([("ch", np.int32)])
+
+tile_graphic = np.dtype([("ch", np.int32), ("fg", "3B"), ("bg", "3B")])
+TILE_DT = np.dtype(
+    [
+        ("move_cost", np.uint8),
+        ("transparent", bool),
+        ("light", tile_graphic),
+        ("dark", tile_graphic),
+    ]
+)
 
 
 class Camera(NamedTuple):
@@ -54,6 +64,13 @@ class Camera(NamedTuple):
 
         return screen_view, world_view
 
+class Tile(NamedTuple):
+    """A NamedTuple type broadcastable to any tile_dt array."""
+
+    move_cost: int
+    transparent: bool
+    light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
+    dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
 
 class Map:
     """Maps hold a descrete set of data which can be switched between more easily."""

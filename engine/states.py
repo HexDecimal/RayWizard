@@ -27,5 +27,8 @@ class InGame(State):
 
     def cmd_move(self, x: int, y: int) -> None:
         # Test example.
-        g.world.player.x += x
-        g.world.player.y += y
+        x = g.world.player.x + x
+        y = g.world.player.y + y
+        if g.world.map.is_not_blocked(x, y):
+            g.world.player.x = x
+            g.world.player.y = y

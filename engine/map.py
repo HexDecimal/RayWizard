@@ -18,3 +18,12 @@ class Map:
         self.height = height
         self.tiles = np.full((width, height), ord("."), TILE_DT, order="F")
         self.actors: Set[engine.actor.Actor] = set()
+
+    def is_not_blocked(self, x: int, y: int) -> bool:
+        """Returns True if this space can accept a large object such as an Actor."""
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            return False  # Out-of-bounds.
+        for actor in self.actors:
+            if actor.x == x and actor.y == y:
+                return False  # Space taken by actor.
+        return True

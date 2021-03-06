@@ -32,3 +32,4 @@ class InGame(State):
         if g.world.map.is_not_blocked(x, y):
             g.world.player.x = x
             g.world.player.y = y
+            g.states.pop()  # Return control to World.loop.

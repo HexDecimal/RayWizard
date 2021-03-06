@@ -5,6 +5,7 @@ Run this module from Python to start this program.
 """
 from __future__ import annotations  # This may be required to resolve import order issues.
 
+import logging
 import sys
 import warnings
 
@@ -14,12 +15,7 @@ import engine.actor
 import engine.states
 import engine.world
 import g
-
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-
-CONSOLE_WIDTH = SCREEN_WIDTH // 12
-CONSOLE_HEIGHT = SCREEN_HEIGHT // 12
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 def main() -> None:
@@ -29,21 +25,15 @@ def main() -> None:
         g.world = engine.world.World()
 
         g.world.player = engine.actor.Actor(0, 0)
-        g.world.map.actors.add(g.world.player)
+        g.world.map.add_actor(g.world.player)
 
-        g.states = [engine.states.InGame()]
-        while g.states:  # Game loop.
-            # Rendering.
-            console = tcod.console.Console(CONSOLE_WIDTH, CONSOLE_HEIGHT, order="F")
-            g.states[-1].on_draw(console)
-            g.context.present(console, integer_scaling=True)
-            # Handle input.
-            for event in tcod.event.wait():
-                if g.states:
-                    g.states[-1].dispatch(event)
+        g.world.map.add_actor(engine.actor.Actor(5, 5))  # Dummy actor.
+
+        g.world.loop()
 
 
 if __name__ == "__main__":
     if not sys.warnoptions:
         warnings.simplefilter("default")  # Enable all runtime warnings.
+    logging.basicConfig(level=logging.INFO)
     main()

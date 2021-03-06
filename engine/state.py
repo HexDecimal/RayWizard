@@ -7,6 +7,7 @@ from __future__ import annotations
 import tcod
 
 import g
+from constants import CONSOLE_HEIGHT, CONSOLE_WIDTH
 
 MOVE_KEYS = {
     # Arrow keys.
@@ -44,6 +45,22 @@ MOVE_KEYS = {
 
 class State(tcod.event.EventDispatch[None]):
     """An abstract state.  Subclasses should be made of this class to handle state."""
+
+    def run_modal(self) -> None:
+        assert self not in g.states
+        g.states.append(self)
+        while self in g.states:
+            # Rendering.
+            console = tcod.console.Console(CONSOLE_WIDTH, CONSOLE_HEIGHT, order="F")
+            g.states[-1].on_draw(console)
+            g.context.present(console, integer_scaling=True)
+            if self not in g.states:
+                return
+            # Handle input.
+            for event in tcod.event.wait():
+                g.states[-1].dispatch(event)
+                if self not in g.states:
+                    return
 
     def on_draw(self, console: tcod.console.Console) -> None:
         """Called when this state should be rendered.

@@ -9,7 +9,7 @@ import numpy as np
 import engine.actor
 import engine.sched
 
-//TILE_DT = np.dtype([("ch", np.int32)])
+#TILE_DT = np.dtype([("ch", np.int32)])
 
 tile_graphic = np.dtype([("ch", np.int32), ("fg", "3B"), ("bg", "3B")])
 TILE_DT = np.dtype(

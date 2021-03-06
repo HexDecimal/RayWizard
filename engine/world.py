@@ -1,10 +1,13 @@
 """World class module."""
 from __future__ import annotations
 
+import logging
 import random
 
 import engine.actor
 import engine.map
+
+logger = logging.getLogger(__name__)
 
 
 class World:
@@ -17,8 +20,9 @@ class World:
         self.rng = random.Random()
 
     def loop(self) -> None:
-        while True:
+        while self.player in self.map.actors:
             next_obj = self.map.schedule[0]
             next_obj.on_turn()
             if self.map.schedule[0] is next_obj:
                 self.map.schedule.rotate(1)
+        logger.info("Player is dead or missing!")

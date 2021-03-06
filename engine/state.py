@@ -42,6 +42,19 @@ MOVE_KEYS = {
     tcod.event.K_n: (1, 1),
 }
 
+HOTBAR_KEYS = {
+    tcod.event.K_0: 0,
+    tcod.event.K_1: 1,
+    tcod.event.K_2: 2,
+    tcod.event.K_3: 3,
+    tcod.event.K_4: 4,
+    tcod.event.K_5: 5,
+    tcod.event.K_6: 6,
+    tcod.event.K_7: 7,
+    tcod.event.K_8: 8,
+    tcod.event.K_9: 9,
+}
+
 
 class State(tcod.event.EventDispatch[None]):
     """An abstract state.  Subclasses should be made of this class to handle state."""
@@ -84,12 +97,17 @@ class State(tcod.event.EventDispatch[None]):
         `x` and `y` are a direction which may also be `0,0`.
         """
 
+    def cmd_cast(self, index: int) -> None:
+        """Cast a spell from the hotbar."""
+
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         """Dispatch keys to various commands.  This creates a consistant interface across states."""
         if event.sym == tcod.event.K_ESCAPE:
             self.cmd_cancel()
         elif event.sym in MOVE_KEYS:
             self.cmd_move(*MOVE_KEYS[event.sym])
+        elif event.sym in HOTBAR_KEYS:
+            self.cmd_cast(HOTBAR_KEYS[event.sym])
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         """Exit the program a quickly as possible."""

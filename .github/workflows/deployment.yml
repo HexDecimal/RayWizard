@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15]
+        os: [ubuntu-20.04, macos-10.15, windows-2019]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -38,13 +38,19 @@ jobs:
       run: |
         pyinstaller main.spec
     - name: List files
+      if: runner.os != 'Windows'
       run: |
         find dist
     - name: Tar files
+      if: runner.os != 'Windows'
       run: |
         tar --format=ustar -czvf ${{matrix.os}}.tar.gz dist/main
+    - name: Archive files
+      if: runner.os == 'Windows'
+      run: |
+        Compress-Archive dist/main ${{matrix.os}}.zip
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v2
       with:
         name: dist
-        path: ${{matrix.os}}.tar.gz
+        path: ${{matrix.os}}.*

@@ -47,6 +47,10 @@ class State(tcod.event.EventDispatch[None]):
     """An abstract state.  Subclasses should be made of this class to handle state."""
 
     def run_modal(self) -> None:
+        """Run this state in a modal loop.
+
+        This state takes effect and this function doesn't return until the state is removed from g.states.
+        """
         assert self not in g.states
         g.states.append(self)
         while self in g.states:

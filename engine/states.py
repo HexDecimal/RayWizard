@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import tcod
 
+import engine.actions
 import g
 from engine.state import State  # Import-time requirement, so `from x import Y` is used.
 
@@ -33,10 +34,5 @@ class InGame(State):
                 console.print(x, y, "@", fg=(0xFF, 0xFF, 0xFF))
 
     def cmd_move(self, x: int, y: int) -> None:
-        # Test example.
-        x = g.world.player.x + x
-        y = g.world.player.y + y
-        if g.world.map.is_not_blocked(x, y):
-            g.world.player.x = x
-            g.world.player.y = y
+        if engine.actions.MoveAction(g.world.player, (x, y)).perform():
             g.states.pop()  # Return control to World.loop.

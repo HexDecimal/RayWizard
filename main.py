@@ -10,7 +10,9 @@ import warnings
 
 import tcod
 
+import engine.actor
 import engine.states
+import engine.world
 import g
 
 SCREEN_WIDTH = 1280
@@ -24,10 +26,15 @@ def main() -> None:
     """Main entrypoint."""
     tileset = tcod.tileset.load_tilesheet("Alloy_curses_12x12.png", 16, 16, tcod.tileset.CHARMAP_CP437)
     with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset) as g.context:
-        g.states = [engine.states.HelloWorld()]
-        while g.states:
+        g.world = engine.world.World()
+
+        g.world.player = engine.actor.Actor(0, 0)
+        g.world.map.actors.add(g.world.player)
+
+        g.states = [engine.states.InGame()]
+        while g.states:  # Game loop.
             # Rendering.
-            console = tcod.console.Console(CONSOLE_WIDTH, CONSOLE_HEIGHT, order="C")
+            console = tcod.console.Console(CONSOLE_WIDTH, CONSOLE_HEIGHT, order="F")
             g.states[-1].on_draw(console)
             g.context.present(console, integer_scaling=True)
             # Handle input.

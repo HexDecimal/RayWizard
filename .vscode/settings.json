@@ -6,7 +6,6 @@
     "python.linting.mypyEnabled": true,
     "python.linting.flake8Enabled": true,
     "python.linting.mypyArgs": [
-        "--strict",
         "--ignore-missing-imports",
         "--follow-imports=silent",
         "--show-column-numbers"
@@ -14,4 +13,9 @@
     "editor.rulers": [
         120
     ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
 }

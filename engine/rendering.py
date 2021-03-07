@@ -29,19 +29,23 @@ def render_tiles(shape: Tuple[int, int]) -> np.ndarray:
     return output
 
 
-FG = (0xFF, 0xFF, 0xFF)
-BG = (0, 0, 0)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BG = BLACK
+
+BORDER_COLOR = (94, 4, 2)
+TEXT_COLOR = WHITE
 
 
 def render_slots(console: tcod.console.Console) -> None:
     """Render the spell slots UI."""
     x = console.width - UI_SIZE[0] + 1
-    console.tiles_rgb[x - 1, :] = ord("▒"), FG, BG
+    console.tiles_rgb[x - 1, :] = ord("▒"), BORDER_COLOR, BLACK
     for i, spell in enumerate(g.world.spell_slots):
         spell_name = "--------" if spell is None else spell.name
         spell_console = tcod.console.Console(UI_SIZE[0] - 1, 6, order="F")
-        spell_console.print(0, 0, f"{i+1:2d}. {spell_name}", fg=FG, bg=BG)
-        spell_console.print(spell_console.width - 3, spell_console.height - 1, "^^^", fg=FG, bg=BG)
+        spell_console.print(0, 0, f"{i+1:2d}. {spell_name}", fg=TEXT_COLOR, bg=BG)
+        spell_console.print(spell_console.width - 3, spell_console.height - 1, "^^^", fg=TEXT_COLOR, bg=BG)
 
         spell_console.blit(console, x, i * 6)
 
@@ -51,7 +55,7 @@ def render_log(log_console: tcod.console.Console) -> None:
     y = log_console.height
     for message in reversed(g.world.log):
         y -= tcod.console.get_height_rect(log_console.width, message)
-        log_console.print_box(0, y, 0, 0, message, fg=FG, bg=BG)
+        log_console.print_box(0, y, 0, 0, message, fg=TEXT_COLOR, bg=BG)
 
 
 def render_main(console: tcod.console.Console) -> None:
@@ -70,7 +74,7 @@ def render_main(console: tcod.console.Console) -> None:
 
     render_slots(console)
 
-    console.tiles_rgb[: -UI_SIZE[0], -UI_SIZE[1]] = 0x2592, FG, BG
+    console.tiles_rgb[: -UI_SIZE[0], -UI_SIZE[1]] = 0x2592, BORDER_COLOR, BLACK
     log_console = tcod.Console(console.width - UI_SIZE[0], UI_SIZE[1] - 1)
     render_log(log_console)
     log_console.blit(console, 0, console.height - UI_SIZE[1] + 1)
@@ -81,4 +85,4 @@ def print_extra_text(console: tcod.console.Console, message: str) -> None:
 
     I'm not sure how this should be handled.
     """
-    console.print(0, console.height - UI_SIZE[1] - 1, message, fg=FG, bg=BG)
+    console.print(0, console.height - UI_SIZE[1] - 1, message, fg=TEXT_COLOR, bg=BG)

@@ -53,12 +53,12 @@ WATER = Tile(
     move_cost=0,
     transparent=True,
     light=(ord("~"), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("~"), (25, 25, 75), (50, 50, 150)),
+    dark=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0x10, 0xFF)),
 )
 
 ICE_FLOOR = Tile(
     move_cost=1,
     transparent=True,
     light=(ord("+"), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("+"), (25, 25, 75), (50, 50, 150)),
+    dark=(ord("+"), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
 )

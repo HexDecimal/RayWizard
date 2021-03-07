@@ -8,8 +8,9 @@ import numpy as np
 
 import engine.actor
 import engine.sched
+import engine.tiles
+from engine.tiles import tile_graphic
 
-tile_graphic = np.dtype([("ch", np.int32), ("fg", "3B"), ("bg", "3B")])
 TILE_DT = np.dtype(
     [
         ("move_cost", np.uint8),
@@ -63,23 +64,6 @@ class Camera(NamedTuple):
         return screen_view, world_view
 
 
-class Tile(NamedTuple):
-    """A NamedTuple type broadcastable to any TILE_DT array."""
-
-    move_cost: int
-    transparent: bool
-    light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
-    dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
-
-
-WALL = Tile(
-    move_cost=0,
-    transparent=False,
-    light=(ord(" "), (255, 255, 255), (130, 110, 50)),
-    dark=(ord(" "), (255, 255, 255), (0, 0, 100)),
-)
-
-
 class Map:
     """Maps hold a descrete set of data which can be switched between more easily."""
 
@@ -87,7 +71,7 @@ class Map:
         self.width = width
         self.height = height
         self.tiles = np.empty((width, height), TILE_DT, order="F")
-        self.tiles[:] = WALL
+        self.tiles[:] = engine.tiles.DEFAULT
         self.actors: Set[engine.actor.Actor] = set()
         self.schedule: Deque[engine.sched.Schedulable] = collections.deque()
         self.camera = Camera(0, 0)

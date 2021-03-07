@@ -9,27 +9,8 @@ import scipy.signal  # type: ignore
 import tcod
 
 import engine.map
+import engine.tiles
 import engine.world
-
-WALL = engine.map.Tile(
-    move_cost=0,
-    transparent=False,
-    light=(ord(" "), (130, 110, 50), (200, 180, 50)),
-    dark=(ord(" "), (25, 25, 75), (50, 50, 100)),
-)
-FLOOR = engine.map.Tile(
-    move_cost=1,
-    transparent=True,
-    light=(ord("."), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("."), (25, 25, 75), (50, 50, 150)),
-)
-
-WATER = engine.map.Tile(
-    move_cost=0,
-    transparent=True,
-    light=(ord("~"), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("~"), (25, 25, 75), (50, 50, 150)),
-)
 
 
 class Room:
@@ -113,7 +94,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     # close_room = False
 
     gm = engine.map.Map(width, height)
-    gm.tiles[...] = WALL
+    gm.tiles[...] = engine.tiles.WALL
     rooms: List[Room] = []
 
     for _ in range(max_rooms):
@@ -128,7 +109,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
             continue  # This room intersects with a previous room.
 
         # Mark room inner area as open.
-        gm.tiles[new_room.inner] = FLOOR
+        gm.tiles[new_room.inner] = engine.tiles.FLOOR
         if rooms:
             # Open a tunnel between rooms.
             if random.randint(0, 99) < 80:
@@ -145,8 +126,8 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
                 t_middle = t_start[0], t_end[1]
             else:
                 t_middle = t_end[0], t_start[1]
-            gm.tiles[tcod.line_where(*t_start, *t_middle)] = FLOOR
-            gm.tiles[tcod.line_where(*t_middle, *t_end)] = FLOOR
+            gm.tiles[tcod.line_where(*t_start, *t_middle)] = engine.tiles.FLOOR
+            gm.tiles[tcod.line_where(*t_middle, *t_end)] = engine.tiles.FLOOR
             # if close_room = False:
             # gm.tiles[tcod.line_where(*t_start, *t_middle-1)] = FLOOR
             # gm.tiles[tcod.line_where(*t_middle-1, *t_end-1)] = FLOOR
@@ -160,7 +141,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     automataMap1 = convolve(randomMap, 10)  # second value is the number of nearby tiles needed to be water.
 
     # step 3: Use map to replace wall and floor tiles with water.
-    gm.tiles[~automataMap1] = WATER
+    gm.tiles[~automataMap1] = engine.tiles.WATER
 
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center)

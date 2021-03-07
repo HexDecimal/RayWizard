@@ -6,12 +6,12 @@ from typing import Tuple
 import numpy as np
 import tcod
 
-import engine.map
 import g
+from engine.tiles import tile_graphic
 
 UI_SIZE = (12, 12)  # Area reserved for the UI.
 
-SHROUD = np.asarray((ord(" "), (0x40, 0x40, 0x40), (0x00, 0x00, 0x00)), dtype=engine.map.tile_graphic)
+SHROUD = np.asarray((ord(" "), (0x40, 0x40, 0x40), (0x00, 0x00, 0x00)), dtype=tile_graphic)
 "The clear graphic before drawing world tiles."
 
 

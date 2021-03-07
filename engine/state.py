@@ -43,16 +43,16 @@ MOVE_KEYS = {
 }
 
 HOTBAR_KEYS = {
-    tcod.event.K_0: 0,
-    tcod.event.K_1: 1,
-    tcod.event.K_2: 2,
-    tcod.event.K_3: 3,
-    tcod.event.K_4: 4,
-    tcod.event.K_5: 5,
-    tcod.event.K_6: 6,
-    tcod.event.K_7: 7,
-    tcod.event.K_8: 8,
-    tcod.event.K_9: 9,
+    tcod.event.K_1: 0,
+    tcod.event.K_2: 1,
+    tcod.event.K_3: 2,
+    tcod.event.K_4: 3,
+    tcod.event.K_5: 4,
+    tcod.event.K_6: 5,
+    tcod.event.K_7: 6,
+    tcod.event.K_8: 7,
+    tcod.event.K_9: 8,
+    tcod.event.K_0: 9,  # Zero key means slot 10.
 }
 
 

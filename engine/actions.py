@@ -27,7 +27,7 @@ class Action:
 class ActionWithDir(Action):
     """An action with a direction."""
 
-    def __init__(self, actor: engine.actor.Actor, direction: Optional[Tuple[int, int]], **kargs: Any):
+    def __init__(self, actor: engine.actor.Actor, direction: Optional[Tuple[int, int]] = None, **kargs: Any):
         super().__init__(actor=actor, **kargs)  # type: ignore
         self._direction = direction
 

@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import logging
 import random
+from typing import List, Optional, Type
 
+import engine.actions
 import engine.actor
 import engine.map
 
@@ -18,6 +20,18 @@ class World:
     def __init__(self) -> None:
         self.map = engine.map.Map(128, 128)
         self.rng = random.Random()
+        self.spell_slots: List[Optional[Type[engine.actions.Action]]] = [
+            engine.actions.PlaceBomb,
+            engine.actions.IceBeam,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        ]  # Spells equipped to the hotbar.
 
     def loop(self) -> None:
         while self.player in self.map.actors:

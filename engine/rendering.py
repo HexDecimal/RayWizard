@@ -9,7 +9,7 @@ import tcod
 import g
 from engine.tiles import tile_graphic
 
-UI_SIZE = (12, 12)  # Area reserved for the UI.
+UI_SIZE = (24, 12)  # Area reserved for the UI.
 
 SHROUD = np.asarray((ord(" "), (0x40, 0x40, 0x40), (0x00, 0x00, 0x00)), dtype=tile_graphic)
 "The clear graphic before drawing world tiles."
@@ -29,6 +29,18 @@ def render_tiles(shape: Tuple[int, int]) -> np.ndarray:
     return output
 
 
+def render_ui(console: tcod.console.Console) -> None:
+    x = console.width - UI_SIZE[0] + 1
+    FG = (0xFF, 0xFF, 0xFF)
+    BG = (0, 0, 0)
+    console.tiles_rgb[x - 1, :] = ord("▒"), FG, BG
+    console.tiles_rgb[x:, :] = ord(" "), FG, BG
+    for i, spell in enumerate(g.world.spell_slots):
+        spell_name = "--------" if spell is None else spell.__name__
+        console.print(x, i * 6, f"{i+1:2d}. {spell_name}", fg=FG, bg=BG)
+        console.print(console.width - 3, i * 6 + 5, "^^^", fg=FG, bg=BG)
+
+
 def render_main(console: tcod.console.Console) -> None:
     """Rendeer the main view.  With the world tiles, any objects, and the UI."""
     # Render world tiles.
@@ -42,3 +54,5 @@ def render_main(console: tcod.console.Console) -> None:
         y = actor.y - cam_y
         if 0 <= x < console_shape[0] and 0 <= y < console_shape[1]:
             console.print(x, y, actor.ch, fg=actor.fg)
+
+    render_ui(console)

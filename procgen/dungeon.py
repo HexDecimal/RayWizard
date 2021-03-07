@@ -9,6 +9,7 @@ import scipy.signal  # type: ignore
 import tcod
 
 import engine.map
+import engine.rendering
 import engine.tiles
 import engine.world
 
@@ -95,6 +96,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
 
     gm = engine.map.Map(width, height)
     gm.tiles[...] = engine.tiles.WALL
+    engine.rendering.debug_map(gm)
     rooms: List[Room] = []
 
     for _ in range(max_rooms):
@@ -110,6 +112,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
 
         # Mark room inner area as open.
         gm.tiles[new_room.inner] = engine.tiles.FLOOR
+        engine.rendering.debug_map(gm)
         if rooms:
             # Open a tunnel between rooms.
             if random.randint(0, 99) < 80:
@@ -128,6 +131,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
                 t_middle = t_end[0], t_start[1]
             gm.tiles[tcod.line_where(*t_start, *t_middle)] = engine.tiles.FLOOR
             gm.tiles[tcod.line_where(*t_middle, *t_end)] = engine.tiles.FLOOR
+            engine.rendering.debug_map(gm)
             # if close_room = False:
             # gm.tiles[tcod.line_where(*t_start, *t_middle-1)] = FLOOR
             # gm.tiles[tcod.line_where(*t_middle-1, *t_end-1)] = FLOOR
@@ -142,6 +146,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
 
     # step 3: Use map to replace wall and floor tiles with water.
     gm.tiles[~automataMap1] = engine.tiles.WATER
+    engine.rendering.debug_map(gm)
 
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center)

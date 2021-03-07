@@ -1,11 +1,13 @@
 """Rendering functions."""
 from __future__ import annotations
 
+import time
 from typing import Tuple
 
 import numpy as np
 import tcod
 
+import engine.map
 import g
 from engine.tiles import tile_graphic
 
@@ -27,6 +29,17 @@ def render_tiles(shape: Tuple[int, int]) -> np.ndarray:
     screen_view, world_view = g.world.map.camera.get_views((map_.width, map_.height), shape)
     output[screen_view] = map_.tiles["dark"][world_view]
     return output
+
+
+def debug_map(map_: engine.map.Map, sleep_time: float = 0.05) -> None:
+    """Present the current map tiles.  This is ignored on release mode."""
+    if not __debug__:
+        return
+    tcod.lib.SDL_PumpEvents()
+    console = tcod.Console(map_.width, map_.height, order="F")
+    console.tiles_rgb[:] = map_.tiles["dark"]
+    g.context.present(console)
+    time.sleep(sleep_time)
 
 
 WHITE = (255, 255, 255)

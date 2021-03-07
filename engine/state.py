@@ -101,6 +101,9 @@ class State(tcod.event.EventDispatch[None]):
     def cmd_cast(self, index: int) -> None:
         """Cast a spell from the hotbar."""
 
+    def debug_regenerate_map(self) -> None:
+        """Regenerate the current map."""
+
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         """Dispatch keys to various commands.  This creates a consistant interface across states."""
         if event.sym == tcod.event.K_ESCAPE:
@@ -109,6 +112,8 @@ class State(tcod.event.EventDispatch[None]):
             self.cmd_move(*MOVE_KEYS[event.sym])
         elif event.sym in HOTBAR_KEYS:
             self.cmd_cast(HOTBAR_KEYS[event.sym])
+        elif __debug__ and event.sym == tcod.event.K_F2:
+            self.debug_regenerate_map()
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         """Exit the program a quickly as possible."""

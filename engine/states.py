@@ -8,6 +8,7 @@ import tcod
 import engine.actions
 import engine.rendering
 import g
+import procgen.dungeon
 from engine.state import State  # Import-time requirement, so `from x import Y` is used.
 
 
@@ -36,6 +37,10 @@ class InGame(State):
         g.world.report(f"You cast {spell.name}")
         if spell.cast(g.world.player):
             g.states.pop()
+
+    def debug_regenerate_map(self) -> None:
+        g.world.map = procgen.dungeon.generate(g.world)
+        g.states.pop()  # Reset the players turn.
 
 
 class AskDirection(State):

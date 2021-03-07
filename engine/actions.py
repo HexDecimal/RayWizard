@@ -89,11 +89,26 @@ class PlaceBomb(ActionWithDir):
         return False
 
 
-class IceBeam(ActionWithDir):
+class Beam(ActionWithDir):
     def perform(self) -> bool:
+        """Trace a line and apply effects along it until a wall is hit."""
         for xy in self.trace_line():
             if not g.world.map.tiles[xy]["transparent"]:
                 break  # Hit wall.
-            if g.world.map.tiles[xy] == engine.tiles.WATER.as_np():
-                g.world.map.tiles[xy] = engine.tiles.ICE_FLOOR
+            self.apply(xy)
         return True
+
+    def apply(self, xy: Tuple[int, int]) -> None:
+        """Apply an effect."""
+
+
+class IceBeam(Beam):
+    def apply(self, xy: Tuple[int, int]) -> None:
+        if g.world.map.tiles[xy] == engine.tiles.WATER.as_np():
+            g.world.map.tiles[xy] = engine.tiles.ICE_FLOOR
+
+
+class HeatBeam(Beam):
+    def apply(self, xy: Tuple[int, int]) -> None:
+        if g.world.map.tiles[xy] == engine.tiles.ICE_FLOOR.as_np():
+            g.world.map.tiles[xy] = engine.tiles.WATER

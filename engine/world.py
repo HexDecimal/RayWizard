@@ -23,7 +23,7 @@ class World:
         self.spell_slots: List[Optional[Type[engine.actions.Action]]] = [
             engine.actions.PlaceBomb,
             engine.actions.IceBeam,
-            None,
+            engine.actions.HeatBeam,
             None,
             None,
             None,

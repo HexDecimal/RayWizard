@@ -14,3 +14,5 @@ import engine.world
 context: tcod.context.Context  # The active context.
 states: List[engine.state.State] = []  # A stack of states, with the last item being the active state.
 world: engine.world.World  # The active world.
+
+debug_dungeon_generation: bool = __debug__  # Visualize the dungeon being generated.

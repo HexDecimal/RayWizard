@@ -31,11 +31,13 @@ def render_tiles(shape: Tuple[int, int]) -> np.ndarray:
     return output
 
 
-def debug_map(map_: engine.map.Map, sleep_time: float = 0.05) -> None:
+def debug_map(map_: engine.map.Map, sleep_time: float = 0) -> None:
     """Present the current map tiles.  This is ignored on release mode."""
-    if not __debug__:
+    if not g.debug_dungeon_generation:
         return
-    tcod.lib.SDL_PumpEvents()
+    for ev in tcod.event.get():
+        if isinstance(ev, tcod.event.KeyDown):
+            g.debug_dungeon_generation = False
     console = tcod.Console(map_.width, map_.height, order="F")
     console.tiles_rgb[:] = map_.tiles["dark"]
     g.context.present(console)

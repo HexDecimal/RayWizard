@@ -31,8 +31,10 @@ class InGame(State):
     def cmd_cast(self, index: int) -> None:
         """Cast a spell from the hotbar."""
         spell = g.world.spell_slots[index]
-        g.world.report(f"You cast {spell}")
-        if spell and spell(g.world.player).perform():
+        if not spell:
+            return
+        g.world.report(f"You cast {spell.name}")
+        if spell.cast(g.world.player):
             g.states.pop()
 
 

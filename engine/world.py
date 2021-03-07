@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import logging
 import random
-from typing import List, Optional, Type
+from typing import List, Optional
 
 import engine.actions
 import engine.actor
 import engine.map
+import engine.spells
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +21,10 @@ class World:
     def __init__(self) -> None:
         self.map = engine.map.Map(128, 128)
         self.rng = random.Random()
-        self.spell_slots: List[Optional[Type[engine.actions.Action]]] = [
-            engine.actions.PlaceBomb,
-            engine.actions.IceBeam,
-            engine.actions.HeatBeam,
+        self.spell_slots: List[Optional[engine.spells.Spell]] = [
+            engine.spells.PlaceBomb(name="Place bomb"),
+            engine.spells.Beam(name="Ice beam", effect=engine.effects.Cold()),
+            engine.spells.Beam(name="Heat beam", effect=engine.effects.Heat()),
             None,
             None,
             None,
@@ -32,6 +33,7 @@ class World:
             None,
             None,
         ]  # Spells equipped to the hotbar.
+        assert len(self.spell_slots) == 10
         self.log: List[str] = []  # Text log.
 
     def report(self, message: str) -> None:

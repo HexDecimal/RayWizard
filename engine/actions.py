@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any, Iterator, Optional, Tuple
 
 import engine.actor
+import engine.effects
 import engine.states
 import engine.tiles
 import g
@@ -61,6 +62,12 @@ class ActionWithDir(Action):
             yield x, y
 
 
+class ActionWithEffect(Action):
+    def __init__(self, actor: engine.actor.Actor, effect: engine.effects.Effect, **kargs: Any):
+        super().__init__(actor=actor, **kargs)  # type: ignore
+        self.effect = effect
+
+
 class IdleAction(Action):
     """Do nothing and pass a turn."""
 
@@ -89,26 +96,11 @@ class PlaceBomb(ActionWithDir):
         return False
 
 
-class Beam(ActionWithDir):
+class Beam(ActionWithDir, ActionWithEffect):
     def perform(self) -> bool:
         """Trace a line and apply effects along it until a wall is hit."""
         for xy in self.trace_line():
             if not g.world.map.tiles[xy]["transparent"]:
                 break  # Hit wall.
-            self.apply(xy)
+            self.effect.apply(*xy)
         return True
-
-    def apply(self, xy: Tuple[int, int]) -> None:
-        """Apply an effect."""
-
-
-class IceBeam(Beam):
-    def apply(self, xy: Tuple[int, int]) -> None:
-        if g.world.map.tiles[xy] == engine.tiles.WATER.as_np():
-            g.world.map.tiles[xy] = engine.tiles.ICE_FLOOR
-
-
-class HeatBeam(Beam):
-    def apply(self, xy: Tuple[int, int]) -> None:
-        if g.world.map.tiles[xy] == engine.tiles.ICE_FLOOR.as_np():
-            g.world.map.tiles[xy] = engine.tiles.WATER

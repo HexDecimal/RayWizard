@@ -88,26 +88,21 @@ def convolve(tiles: np.ndarray, wall_rule: int = 5) -> np.ndarray:
 
     # Use convolve2d, the 2nd input is a 5x5 array, with a core 3x3 of 2s surrounded by 1s.
     neighbors = scipy.signal.convolve2d(
-        ~tiles, [[1, 1, 1, 1, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1], [1, 1, 1, 1, 1]], "same"
+        tiles == 0, [[1, 1, 1, 1, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1], [1, 1, 1, 1, 1]], "same"
     )
     return neighbors < wall_rule  # type: ignore  # Apply the wall rule.
 
 
-# creates a map of unifrom random noise to feed into cave and water generators.
-# We could use a frequency base noise generator if we want to have features of a particular general size.
-# But, as we only really have 2 states rather than a range like for an elevation generator.
-# TRis should suffice.
-# WallPrecent is an integer which represents what portion out 100 should be spawned with walls.
-# Walls are 0s in output.
-def createNoiseMap(theWidth: int, theHeight: int, wallPercent: int) -> np.ndarray:
-    theTiles = np.full((theWidth, theHeight), -1, order="F")
-    for theX in range(theWidth):
-        for theY in range(theHeight):
-            if random.randint(0, 100) < wallPercent:
-                theTiles[theX, theY] = 0
-            else:
-                theTiles[theX, theY] = 1
-    return theTiles
+def create_noise_map(width: int, height: int, wall_percent: int) -> np.ndarray:
+    """Creates a map of unifrom random noise to feed into cave and water generators.
+
+    We could use a frequency base noise generator if we want to have features of a particular general size.
+    But, as we only really have 2 states rather than a range like for an elevation generator.
+    TRis should suffice.
+    `wall_percent` is an integer which represents what portion out 100 should be spawned with walls.
+    Walls are False in output.
+    """
+    return np.random.random((height, width)).transpose() < wall_percent / 100  # type: ignore
 
 
 def generate(model: engine.world.World, width: int = 80, height: int = 45) -> engine.map.Map:
@@ -159,16 +154,13 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
 
     # Start of Water generation:
     # step 1 make random map noise:
-    randomMap = createNoiseMap(width, height, 75)
+    randomMap = create_noise_map(width, height, 80)
 
     # step 2: feed to cellular automata sevewral times (number of times based on tweaking.
     automataMap1 = convolve(randomMap, 10)  # second value is the number of nearby tiles needed to be water.
 
     # step 3: Use map to replace wall and floor tiles with water.
-    for theX in range(width):
-        for theY in range(height):
-            if automataMap1[theX, theY] == 1:
-                gm.tiles[theX, theY] = WATER
+    gm.tiles[~automataMap1] = WATER
 
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center)

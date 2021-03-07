@@ -9,7 +9,15 @@ import numpy as np
 import engine.actor
 import engine.sched
 
-TILE_DT = np.dtype([("ch", np.int32)])
+tile_graphic = np.dtype([("ch", np.int32), ("fg", "3B"), ("bg", "3B")])
+TILE_DT = np.dtype(
+    [
+        ("move_cost", np.uint8),
+        ("transparent", bool),
+        ("light", tile_graphic),
+        ("dark", tile_graphic),
+    ]
+)
 
 
 class Camera(NamedTuple):
@@ -55,13 +63,31 @@ class Camera(NamedTuple):
         return screen_view, world_view
 
 
+class Tile(NamedTuple):
+    """A NamedTuple type broadcastable to any TILE_DT array."""
+
+    move_cost: int
+    transparent: bool
+    light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
+    dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
+
+
+WALL = Tile(
+    move_cost=0,
+    transparent=False,
+    light=(ord(" "), (255, 255, 255), (130, 110, 50)),
+    dark=(ord(" "), (255, 255, 255), (0, 0, 100)),
+)
+
+
 class Map:
     """Maps hold a descrete set of data which can be switched between more easily."""
 
     def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
-        self.tiles = np.full((width, height), ord("."), TILE_DT, order="F")
+        self.tiles = np.empty((width, height), TILE_DT, order="F")
+        self.tiles[:] = WALL
         self.actors: Set[engine.actor.Actor] = set()
         self.schedule: Deque[engine.sched.Schedulable] = collections.deque()
         self.camera = Camera(0, 0)
@@ -75,11 +101,13 @@ class Map:
         self.actors.remove(actor)
         self.schedule.remove(actor)
 
-    def is_not_blocked(self, x: int, y: int) -> bool:
+    def is_blocked(self, x: int, y: int) -> bool:
         """Returns True if this space can accept a large object such as an Actor."""
         if not (0 <= x < self.width and 0 <= y < self.height):
-            return False  # Out-of-bounds.
+            return True  # Out-of-bounds.
+        if not self.tiles["move_cost"][x, y]:
+            return True  # Blocked by tile.
         for actor in self.actors:
             if actor.x == x and actor.y == y:
-                return False  # Space taken by actor.
-        return True
+                return True  # Space taken by actor.
+        return False

@@ -58,7 +58,7 @@ class MoveAction(ActionWithDir):
         if self.direction == (0, 0):
             return IdleAction(self.actor).perform()
         xy = self.target_xy
-        if g.world.map.is_not_blocked(*xy):
+        if not g.world.map.is_blocked(*xy):
             self.actor.x, self.actor.y = xy
             return True
         return False
@@ -69,7 +69,7 @@ class PlaceBomb(ActionWithDir):
 
     def perform(self) -> bool:
         xy = self.target_xy
-        if g.world.map.is_not_blocked(*xy):
+        if not g.world.map.is_blocked(*xy):
             g.world.map.add_actor(engine.actor.Bomb(*xy))
             return True
         return False

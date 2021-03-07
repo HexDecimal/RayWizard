@@ -30,7 +30,7 @@ class InGame(State):
 
     def cmd_cast(self, index: int) -> None:
         # Test spell-like action.
-        if engine.actions.PlaceBomb(g.world.player, None).perform():
+        if engine.actions.IceBeam(g.world.player, None).perform():
             g.states.pop()
 
 

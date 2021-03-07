@@ -1,10 +1,11 @@
 """Collections of actions."""
 from __future__ import annotations
 
-from typing import Any, Optional, Tuple
+from typing import Any, Iterator, Optional, Tuple
 
 import engine.actor
 import engine.states
+import engine.tiles
 import g
 
 
@@ -46,6 +47,19 @@ class ActionWithDir(Action):
         """The target position immediately in front of this action."""
         return self.actor.x + self.direction[0], self.actor.y + self.direction[1]
 
+    def trace_line(self) -> Iterator[Tuple[int, int]]:
+        """Trace a line in the provided direction until out of bounds."""
+        x, y = self.actor.x, self.actor.y
+        if self.direction == (0, 0):
+            yield x, y  # Target self.
+            return
+        while True:
+            x += self.direction[0]
+            y += self.direction[1]
+            if not g.world.map.in_bounds(x, y):
+                break
+            yield x, y
+
 
 class IdleAction(Action):
     """Do nothing and pass a turn."""
@@ -73,3 +87,13 @@ class PlaceBomb(ActionWithDir):
             g.world.map.add_actor(engine.actor.Bomb(*xy))
             return True
         return False
+
+
+class IceBeam(ActionWithDir):
+    def perform(self) -> bool:
+        for xy in self.trace_line():
+            if not g.world.map.tiles[xy]["transparent"]:
+                break  # Hit wall.
+            if g.world.map.tiles[xy] == engine.tiles.WATER.as_np():
+                g.world.map.tiles[xy] = engine.tiles.ICE_FLOOR
+        return True

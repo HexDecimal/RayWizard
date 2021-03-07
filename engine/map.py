@@ -9,16 +9,7 @@ import numpy as np
 import engine.actor
 import engine.sched
 import engine.tiles
-from engine.tiles import tile_graphic
-
-TILE_DT = np.dtype(
-    [
-        ("move_cost", np.uint8),
-        ("transparent", bool),
-        ("light", tile_graphic),
-        ("dark", tile_graphic),
-    ]
-)
+from engine.tiles import TILE_DT
 
 
 class Camera(NamedTuple):
@@ -85,9 +76,13 @@ class Map:
         self.actors.remove(actor)
         self.schedule.remove(actor)
 
+    def in_bounds(self, x: int, y: int) -> bool:
+        """Returns True if `x`,`y` is in bounds of this map."""
+        return 0 <= x < self.width and 0 <= y < self.height
+
     def is_blocked(self, x: int, y: int) -> bool:
         """Returns True if this space can accept a large object such as an Actor."""
-        if not (0 <= x < self.width and 0 <= y < self.height):
+        if not self.in_bounds(x, y):
             return True  # Out-of-bounds.
         if not self.tiles["move_cost"][x, y]:
             return True  # Blocked by tile.

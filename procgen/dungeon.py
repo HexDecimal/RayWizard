@@ -79,7 +79,7 @@ class Room:
 
 
 # creates smooth caves/water given noise or current map position.
-def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
+def convolve(tiles: np.ndarray, wall_rule: int = 5) -> np.ndarray:
     """Return the next step of the cave generation algorithm.
     `tiles` is the input array. (0: wall, 1: floor)
     If the 3x3 area around a tile (including itself) has `wall_rule` number of
@@ -90,7 +90,7 @@ def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
     neighbors = scipy.signal.convolve2d(
         ~tiles, [[1, 1, 1, 1, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1], [1, 1, 1, 1, 1]], "same"
     )
-    return neighbors < wall_rule  # Apply the wall rule.
+    return neighbors < wall_rule  # type: ignore  # Apply the wall rule.
 
 
 # creates a map of unifrom random noise to feed into cave and water generators.
@@ -99,10 +99,10 @@ def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
 # TRis should suffice.
 # WallPrecent is an integer which represents what portion out 100 should be spawned with walls.
 # Walls are 0s in output.
-def createNoiseMap(theWidth: int, theHeight: int, wallPercent: int) -> np.array:
+def createNoiseMap(theWidth: int, theHeight: int, wallPercent: int) -> np.ndarray:
     theTiles = np.full((theWidth, theHeight), -1, order="F")
-    for theX in theWidth:
-        for theY in theHeight:
+    for theX in range(theWidth):
+        for theY in range(theHeight):
             if random.randint(0, 100) < wallPercent:
                 theTiles[theX, theY] = 0
             else:
@@ -165,10 +165,10 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     automataMap1 = convolve(randomMap, 10)  # second value is the number of nearby tiles needed to be water.
 
     # step 3: Use map to replace wall and floor tiles with water.
-    for theX in width:
-        for theY in height:
+    for theX in range(width):
+        for theY in range(height):
             if automataMap1[theX, theY] == 1:
-                gm.tiles[theX, theY] == WATER
+                gm.tiles[theX, theY] = WATER
 
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center)

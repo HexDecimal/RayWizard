@@ -1,7 +1,7 @@
 """Collections of actions."""
 from __future__ import annotations
 
-from typing import Any, Iterator, Optional, Tuple
+from typing import Any, Iterator, Optional, Tuple, Type
 
 import engine.actor
 import engine.effects
@@ -85,13 +85,17 @@ class MoveAction(ActionWithDir):
         return False
 
 
-class PlaceBomb(ActionWithDir):
+class PlaceActor(ActionWithDir):
     """Place bomb, pratice action."""
+
+    def __init__(self, actor: engine.actor.Actor, spawn: Type[engine.actor.Actor], **kargs: Any):
+        self.spawn = spawn
+        super().__init__(actor=actor, **kargs)
 
     def perform(self) -> bool:
         xy = self.target_xy
         if not g.world.map.is_blocked(*xy):
-            g.world.map.add_actor(engine.actor.Bomb(*xy))
+            g.world.map.add_actor(self.spawn(*xy))
             return True
         return False
 

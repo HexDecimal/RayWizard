@@ -59,3 +59,15 @@ class Bomb(Actor):
         """Explodes immediately if hit with a heat attacks."""
         if isinstance(effect, engine.effects.Heat):
             self.explode()
+
+
+class Totem(Actor):
+    def __init__(self, x: int, y: int):
+        super().__init__(x, y)
+        self.ch = "&"
+
+    def apply_effect(self, effect: engine.effects.Effect) -> None:
+        g.world.map.remove_actor(self)
+        for y in range(self.y - 2, self.y + 3):
+            for x in range(self.x - 2, self.x + 3):
+                effect.apply(x, y)

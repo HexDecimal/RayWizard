@@ -1,7 +1,7 @@
 """The collection of player spells."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Type
 
 import engine.actions
 import engine.actor
@@ -16,9 +16,13 @@ class Spell:
         raise NotImplementedError("Must be overridden.")
 
 
-class PlaceBomb(Spell):
+class PlaceActor(Spell):
+    def __init__(self, *, spawn: Type[engine.actor.Actor], **kargs: Any):
+        self.spawn = spawn
+        super().__init__(**kargs)
+
     def cast(self, actor: engine.actor.Actor) -> bool:
-        return engine.actions.PlaceBomb(actor).perform()
+        return engine.actions.PlaceActor(actor, spawn=self.spawn).perform()
 
 
 class Beam(Spell):

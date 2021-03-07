@@ -22,10 +22,10 @@ class World:
         self.map = engine.map.Map(128, 128)
         self.rng = random.Random()
         self.spell_slots: List[Optional[engine.spells.Spell]] = [
-            engine.spells.PlaceBomb(name="Place bomb"),
+            engine.spells.PlaceActor(name="Place bomb", spawn=engine.actor.Bomb),
             engine.spells.Beam(name="Ice beam", effect=engine.effects.Cold()),
             engine.spells.Beam(name="Heat beam", effect=engine.effects.Heat()),
-            None,
+            engine.spells.PlaceActor(name="Place totem", spawn=engine.actor.Totem),
             None,
             None,
             None,

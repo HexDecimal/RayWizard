@@ -31,6 +31,7 @@ class InGame(State):
     def cmd_cast(self, index: int) -> None:
         """Cast a spell from the hotbar."""
         spell = g.world.spell_slots[index]
+        g.world.report(f"You cast {spell}")
         if spell and spell(g.world.player).perform():
             g.states.pop()
 
@@ -40,7 +41,7 @@ class AskDirection(State):
 
     def on_draw(self, console: tcod.console.Console) -> None:
         engine.rendering.render_main(console)
-        console.print(0, console.height - 1, "Pick a direction...", fg=(0xFF, 0xFF, 0xFF), bg=(0, 0, 0))
+        engine.rendering.print_extra_text(console, "Pick a direction...")
 
     def cmd_move(self, x: int, y: int) -> None:
         self.direction = (x, y)

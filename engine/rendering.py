@@ -29,10 +29,13 @@ def render_tiles(shape: Tuple[int, int]) -> np.ndarray:
     return output
 
 
-def render_ui(console: tcod.console.Console) -> None:
+FG = (0xFF, 0xFF, 0xFF)
+BG = (0, 0, 0)
+
+
+def render_slots(console: tcod.console.Console) -> None:
+    """Render the spell slots UI."""
     x = console.width - UI_SIZE[0] + 1
-    FG = (0xFF, 0xFF, 0xFF)
-    BG = (0, 0, 0)
     console.tiles_rgb[x - 1, :] = ord("▒"), FG, BG
     for i, spell in enumerate(g.world.spell_slots):
         spell_name = "--------" if spell is None else spell.__name__
@@ -41,6 +44,14 @@ def render_ui(console: tcod.console.Console) -> None:
         spell_console.print(spell_console.width - 3, spell_console.height - 1, "^^^", fg=FG, bg=BG)
 
         spell_console.blit(console, x, i * 6)
+
+
+def render_log(log_console: tcod.console.Console) -> None:
+    """Render the log to a dedicated console."""
+    y = log_console.height
+    for message in reversed(g.world.log):
+        y -= tcod.console.get_height_rect(log_console.width, message)
+        log_console.print(0, y, message, fg=FG, bg=BG)
 
 
 def render_main(console: tcod.console.Console) -> None:
@@ -57,4 +68,17 @@ def render_main(console: tcod.console.Console) -> None:
         if 0 <= x < console_shape[0] and 0 <= y < console_shape[1]:
             console.print(x, y, actor.ch, fg=actor.fg)
 
-    render_ui(console)
+    render_slots(console)
+
+    console.tiles_rgb[: -UI_SIZE[0], -UI_SIZE[1]] = 0x2592, FG, BG
+    log_console = tcod.Console(console.width - UI_SIZE[0], UI_SIZE[1] - 1)
+    render_log(log_console)
+    log_console.blit(console, 0, console.height - UI_SIZE[1] + 1)
+
+
+def print_extra_text(console: tcod.console.Console, message: str) -> None:
+    """Prints extra temporary text.
+
+    I'm not sure how this should be handled.
+    """
+    console.print(0, console.height - UI_SIZE[1] - 1, message, fg=FG, bg=BG)

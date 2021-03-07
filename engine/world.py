@@ -32,6 +32,12 @@ class World:
             None,
             None,
         ]  # Spells equipped to the hotbar.
+        self.log: List[str] = []  # Text log.
+
+    def report(self, message: str) -> None:
+        """Append to the text log."""
+        logger.info(message)
+        self.log.append(message)
 
     def loop(self) -> None:
         while self.player in self.map.actors:

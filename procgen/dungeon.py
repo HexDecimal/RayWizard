@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import random
 from typing import Iterator, List, Tuple
-#from scipy import signal
-#How do I get scipy to be setup.
 
+import scipy.signal
 import numpy as np
 import tcod
 
@@ -79,19 +78,19 @@ class Room:
             yield x, y
 
 #creates smooth caves/water given noise or current map position.
-#def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
+def convolve(tiles: np.array, wall_rule: int = 5) -> np.array:
     """Return the next step of the cave generation algorithm.
     `tiles` is the input array. (0: wall, 1: floor)
     If the 3x3 area around a tile (including itself) has `wall_rule` number of
     walls then the tile will become a wall.
     """
-    """
+
     # Use convolve2d, the 2nd input is a 5x5 array, with a core 3x3 of 2s surrounded by 1s.
     neighbors = scipy.signal.convolve2d(
         ~tiles, [[1, 1, 1, 1, 1], [1, 2, 2, 2, 1], [1, 2, 2, 2, 1],[1, 2, 2, 2, 1],[1, 1, 1, 1, 1]], "same"
     )
     return neighbors < wall_rule  # Apply the wall rule.
-    """
+
 
 #creates a map of unifrom random noise to feed into cave and water generators.
 #We could use a frequency base noise generator if we want to have features of a particular general size.
@@ -100,7 +99,7 @@ class Room:
 #WallPrecent is an integer which represents what portion out 100 should be spawned with walls.
 #Walls are 0s in output.
 def createNoiseMap(theWidth: int, theHeight: int, wallPercent: int) -> np.array:
-    theTiles = np.array([-1, -1],[-1, -1])
+    theTiles = np.full((theWidth, theHeight), -1, order="F")
     for theX in theWidth:
         for theY in theHeight:
             if random.randint(0,100) < wallPercent:
@@ -152,17 +151,23 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
                 t_middle = t_end[0], t_start[1]
             gm.tiles[tcod.line_where(*t_start, *t_middle)] = FLOOR
             gm.tiles[tcod.line_where(*t_middle, *t_end)] = FLOOR
-            #if (close_room = False)
+            #if close_room = False:
                 #gm.tiles[tcod.line_where(*t_start, *t_middle-1)] = FLOOR
                 #gm.tiles[tcod.line_where(*t_middle-1, *t_end-1)] = FLOOR
         rooms.append(new_room)
 
     #Start of Water generation:
     #step 1 make random map noise:
+    randomMap = createNoiseMap(width, height, 75)
 
     #step 2: feed to cellular automata sevewral times (number of times based on tweaking.
+    automataMap1 = convolve(randomMap, 10) #second value is the number of nearby tiles needed to be water.
 
-    #step 3: Use map to repalce wall and floor tiles with water.
+    #step 3: Use map to replace wall and floor tiles with water.
+    for theX in width:
+        for theY in height:
+            if automataMap1[theX,theY] == 1:
+                gm.tiles[theX,theY] == WATER
 
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center)

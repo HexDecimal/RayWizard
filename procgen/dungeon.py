@@ -5,7 +5,7 @@ import random
 from typing import Iterator, List, Tuple
 
 import numpy as np
-import scipy.signal
+import scipy.signal  # type: ignore
 import tcod
 
 import engine.map

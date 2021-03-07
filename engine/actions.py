@@ -102,5 +102,7 @@ class Beam(ActionWithDir, ActionWithEffect):
         for xy in self.trace_line():
             if not g.world.map.tiles[xy]["transparent"]:
                 break  # Hit wall.
+            for actor in [actor for actor in g.world.map.actors if xy == (actor.x, actor.y)]:
+                actor.apply_effect(self.effect)
             self.effect.apply(*xy)
         return True

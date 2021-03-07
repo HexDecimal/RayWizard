@@ -29,6 +29,9 @@ class Actor(Schedulable):
             return
         logger.info(f"Non-Player turn: {self}")
 
+    def apply_effect(self, effect: engine.effects.Effect) -> None:
+        """Take damage or trigger side-effects."""
+
 
 class Bomb(Actor):
     """Counts down to zero and then deletes nearby actors."""
@@ -38,12 +41,21 @@ class Bomb(Actor):
         self.timer = 5
         self.ch = str(self.timer)
 
+    def explode(self) -> None:
+        # Should be replaced by an effect.
+        for actor in list(g.world.map.actors):
+            dist = abs(actor.x - self.x) + abs(actor.y - self.y)
+            if dist <= 2:
+                g.world.map.remove_actor(actor)
+
     def on_turn(self) -> None:
         self.timer -= 1
         if self.timer < 0:
-            for actor in list(g.world.map.actors):
-                dist = abs(actor.x - self.x) + abs(actor.y - self.y)
-                if dist <= 2:
-                    g.world.map.remove_actor(actor)
+            self.explode()
         else:
             self.ch = str(self.timer)
+
+    def apply_effect(self, effect: engine.effects.Effect) -> None:
+        """Explodes immediately if hit with a heat attacks."""
+        if isinstance(effect, engine.effects.Heat):
+            self.explode()

@@ -129,12 +129,12 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
                 t_middle = t_start[0], t_end[1]
             else:
                 t_middle = t_end[0], t_start[1]
-            gm.tiles[tcod.line_where(*t_start, *t_middle)] = engine.tiles.FLOOR
-            gm.tiles[tcod.line_where(*t_middle, *t_end)] = engine.tiles.FLOOR
+            tunnel_indices = np.r_[
+                tcod.los.bresenham(t_start, t_middle), tcod.los.bresenham(t_middle, t_end)  # Concatenate lines.
+            ].transpose()  # tunnel_indices[axis, index]
+            tunnel_indices = np.append(tunnel_indices, tunnel_indices - 1, axis=1)  # Make tunnels 2 wide.
+            gm.tiles[tuple(tunnel_indices)] = engine.tiles.FLOOR
             engine.rendering.debug_map(gm)
-            # if close_room = False:
-            # gm.tiles[tcod.line_where(*t_start, *t_middle-1)] = FLOOR
-            # gm.tiles[tcod.line_where(*t_middle-1, *t_end-1)] = FLOOR
         rooms.append(new_room)
 
     # Start of Water generation:

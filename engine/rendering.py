@@ -89,10 +89,17 @@ def render_main(console: tcod.console.Console) -> None:
 
     render_slots(console)
 
-    console.tiles_rgb[: -UI_SIZE[0], -UI_SIZE[1]] = 0x2592, BORDER_COLOR, BLACK
-    log_console = tcod.Console(console.width - UI_SIZE[0], UI_SIZE[1] - 1)
+    STATUS_WIDTH = 20
+    console.tiles_rgb[: -UI_SIZE[0], -UI_SIZE[1]] = 0x2592, BORDER_COLOR, BLACK  # Bar along the lower end of the map.
+    console.tiles_rgb[-UI_SIZE[0] - STATUS_WIDTH - 1, -UI_SIZE[1] :] = (0x2592, BORDER_COLOR, BLACK)  # log/status bar.
+
+    log_console = tcod.Console(console.width - UI_SIZE[0] - STATUS_WIDTH - 1, UI_SIZE[1] - 1)
     render_log(log_console)
     log_console.blit(console, 0, console.height - UI_SIZE[1] + 1)
+
+    status_console = tcod.Console(STATUS_WIDTH, UI_SIZE[1] - 1)
+    status_console.print(0, 0, f"Status - {g.world.player.x},{g.world.player.y}")
+    status_console.blit(console, console.width - UI_SIZE[0] - STATUS_WIDTH, console.height - UI_SIZE[1] + 1)
 
 
 def print_extra_text(console: tcod.console.Console, message: str) -> None:

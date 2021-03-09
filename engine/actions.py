@@ -1,6 +1,7 @@
 """Collections of actions."""
 from __future__ import annotations
 
+import logging
 from typing import Any, Iterator, Optional, Tuple, Type
 
 import engine.actor
@@ -8,6 +9,8 @@ import engine.effects
 import engine.states
 import engine.tiles
 import g
+
+logger = logging.getLogger(__name__)
 
 
 class Action:
@@ -107,4 +110,41 @@ class Beam(ActionWithDir, ActionWithEffect):
             if not g.world.map.tiles[xy]["transparent"]:
                 break  # Hit wall.
             self.effect.apply(*xy)
+        return True
+
+
+class RandomStep(Action):
+    """Move in a random direction."""
+
+    def perform(self) -> bool:
+        direction = g.world.rng.choice(
+            [
+                (1, 1),
+                (-1, 1),
+                (-1, -1),
+                (1, -1),
+                (1, 0),
+                (-1, 0),
+                (0, 1),
+                (0, -1),
+            ]
+        )
+        return engine.actions.MoveAction(self.actor, direction).perform()
+
+
+class DefaultAI(Action):
+    """Default AI action when None is given to Actor."""
+
+    def perform(self) -> bool:
+        return RandomStep(self.actor).perform()
+
+
+class PlayerControl(Action):
+    """Give control to the player."""
+
+    def perform(self) -> bool:
+        logger.info("Player turn")
+        assert g.world.player is self.actor
+        g.world.map.camera = engine.map.Camera(self.actor.x, self.actor.y)
+        engine.states.InGame().run_modal()
         return True

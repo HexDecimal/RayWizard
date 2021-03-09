@@ -8,6 +8,7 @@ import numpy as np
 import scipy.signal  # type: ignore
 import tcod
 
+import engine.actions
 import engine.map
 import engine.rendering
 import engine.tiles
@@ -153,7 +154,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
         gm.add_actor(engine.actor.Actor(*room.center))
 
     # Add player to the first room.
-    model.player = engine.actor.Actor(*rooms[0].center)
+    model.player = engine.actor.Actor(*rooms[0].center, ai=engine.actions.PlayerControl)
     gm.add_actor(model.player)
 
     return gm

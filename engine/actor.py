@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import logging
+from typing import Optional, Type
 
+import engine.actions
 import engine.map
 import engine.states
 import g
@@ -17,18 +19,15 @@ class Actor(Schedulable):
     ch = "@"
     fg = (0xFF, 0xFF, 0xFF)
 
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, *, ai: Optional[Type[engine.actions.Action]] = None):
         self.x = x
         self.y = y
         self.hp = 10
+        self.ai = ai(self) if ai is not None else engine.actions.DefaultAI(self)
 
     def on_turn(self) -> None:
-        if self is g.world.player:
-            logger.info("Player turn")
-            g.world.map.camera = engine.map.Camera(self.x, self.y)
-            engine.states.InGame().run_modal()
-            return
-        logger.info(f"Non-Player turn: {self}")
+        assert self.ai.actor is self
+        self.ai.perform()
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""

@@ -20,6 +20,7 @@ class Actor(Schedulable):
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
+        self.hp = 10
 
     def on_turn(self) -> None:
         if self is g.world.player:
@@ -31,6 +32,12 @@ class Actor(Schedulable):
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
+        damage = 5  # Placeholder.
+        g.world.report(f"{self} takes {damage} damage.")
+        self.hp -= damage
+        if self.hp <= 0:
+            g.world.report(f"{self} dies.")
+            g.world.map.remove_actor(self)
 
 
 class Bomb(Actor):

@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Iterator, Optional, Tuple, Type
+from typing import Any, Iterator, List, Optional, Tuple, Type
+
+import tcod
 
 import engine.actor
 import engine.effects
@@ -79,6 +81,7 @@ class MoveAction(ActionWithDir):
     """Move an actor normally."""
 
     def perform(self) -> bool:
+        assert -1 <= self.direction[0] <= 1 and -1 <= self.direction[1] <= 1, self.direction
         if self.direction == (0, 0):
             return IdleAction(self.actor).perform()
         xy = self.target_xy
@@ -117,26 +120,64 @@ class RandomStep(Action):
     """Move in a random direction."""
 
     def perform(self) -> bool:
-        direction = g.world.rng.choice(
-            [
-                (1, 1),
-                (-1, 1),
-                (-1, -1),
-                (1, -1),
-                (1, 0),
-                (-1, 0),
-                (0, 1),
-                (0, -1),
-            ]
-        )
+        direction = g.world.rng.choice([(1, 1), (-1, 1), (-1, -1), (1, -1), (1, 0), (-1, 0), (0, 1), (0, -1)])
         return engine.actions.MoveAction(self.actor, direction).perform()
+
+
+class Pathfind(Action):
+    """Pathfind to `dest_xy`, this will go one step in that direction per performance."""
+
+    def __init__(self, actor: engine.actor.Actor, dest_xy: Tuple[int, int]):
+        cost = g.world.map.tiles["move_cost"].copy()
+        for other in g.world.map.actors:
+            cost[other.x, other.y] += 10  # Add some actor avoidance.
+        pathfinder = tcod.path.Pathfinder(tcod.path.SimpleGraph(cost=cost, cardinal=2, diagonal=3))
+        pathfinder.add_root((actor.x, actor.y))
+        self.path: List[Tuple[int, int]] = pathfinder.path_from(dest_xy)[:-1].tolist()
+        "The path to follow. This is a stack, so the last item is the next path."
+        super().__init__(actor)
+
+    def perform(self) -> bool:
+        """Follow the path until the list is empty."""
+        if not self.path:
+            return False
+        next_x, next_y = self.path.pop()
+        if MoveAction(self.actor, direction=(next_x - self.actor.x, next_y - self.actor.y)).perform():
+            return True
+        self.path = []
+        return False
+
+
+class RandomPatrol(Action):
+    """Pathfind to random areas."""
+
+    def __init__(self, actor: engine.actor.Actor):
+        self.pathfinder: Optional[Pathfind] = None
+        super().__init__(actor)
+
+    def perform(self) -> bool:
+        """Generate new Pathfind instances then follow them until they're exhausted."""
+        rng = g.world.rng
+        map_ = g.world.map
+        if not self.pathfinder:
+            # Can be improved to guarantee a valid path.
+            self.pathfinder = Pathfind(self.actor, (rng.randint(0, map_.width - 1), rng.randint(0, map_.height - 1)))
+        if self.pathfinder:
+            if self.pathfinder.perform():
+                return True
+        self.pathfinder = None
+        return False
 
 
 class DefaultAI(Action):
     """Default AI action when None is given to Actor."""
 
+    def __init__(self, actor: engine.actor.Actor):
+        self.patrol: RandomPatrol = RandomPatrol(actor)
+        super().__init__(actor)
+
     def perform(self) -> bool:
-        return RandomStep(self.actor).perform()
+        return self.patrol.perform()
 
 
 class PlayerControl(Action):

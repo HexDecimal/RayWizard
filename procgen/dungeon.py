@@ -148,6 +148,10 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     gm.tiles[~automataMap1] = engine.tiles.WATER
     engine.rendering.debug_map(gm)
 
+    # Add actors to rooms.
+    for room in rooms[1:]:
+        gm.add_actor(engine.actor.Actor(*room.center))
+
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center)
     gm.add_actor(model.player)

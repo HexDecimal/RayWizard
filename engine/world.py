@@ -7,7 +7,6 @@ from typing import List, Optional
 
 import numpy as np
 
-import engine.actions
 import engine.actor
 import engine.map
 import engine.spells
@@ -55,4 +54,8 @@ class World:
             next_obj.on_turn()
             if self.map.schedule and self.map.schedule[0] is next_obj:
                 self.map.schedule.rotate(1)
+                if isinstance(next_obj, engine.actor.Actor):
+                    tile_effect: Optional[engine.effects.Effect] = self.map.tiles["effect"][next_obj.xy]
+                    if tile_effect:
+                        tile_effect.apply(*next_obj.xy)
         logger.info("Player is dead or missing!")

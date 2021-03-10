@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import NamedTuple, Tuple
+from typing import NamedTuple, Optional, Tuple
 
 import numpy as np
+
+import engine.effects
+from engine.effects import Effect
 
 tile_graphic = np.dtype([("ch", np.int32), ("fg", "3B"), ("bg", "3B")])
 
@@ -11,6 +14,7 @@ TILE_DT = np.dtype(
         ("move_cost", np.uint8),
         ("transparent", bool),
         ("graphic", tile_graphic),
+        ("effect", object),
     ]
 )
 
@@ -21,6 +25,7 @@ class Tile(NamedTuple):
     move_cost: int
     transparent: bool
     graphic: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
+    effect: Optional[engine.effects.Effect] = None
 
     def as_np(self) -> np.ndarray:
         """Return this tile as an array scaler."""
@@ -54,4 +59,11 @@ ICE_FLOOR = Tile(
     move_cost=1,
     transparent=True,
     graphic=(ord("+"), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
+)
+
+ACID = Tile(
+    move_cost=1,
+    transparent=True,
+    graphic=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0xB0, 0x10)),
+    effect=Effect(power=3),
 )

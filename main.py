@@ -11,8 +11,6 @@ import warnings
 
 import tcod
 
-import engine.actor
-import engine.states
 import engine.world
 import g
 import procgen.dungeon

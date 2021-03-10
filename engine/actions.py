@@ -204,6 +204,37 @@ class DefaultAI(Action):
         return self.patrol.perform()
 
 
+class SeekEnemy(Action):
+    def __init__(self, actor: engine.actor.Actor):
+        self.pathfinder: Optional[Pathfind] = None
+        super().__init__(actor)
+
+    def distance_to(self, other: engine.actor.Actor) -> int:
+        """Return the squared distance to another actor."""
+        return (self.actor.x - other.x) ** 2 + (self.actor.y - other.y) ** 2
+
+    def get_targets(self) -> Iterator[engine.actor.Actor]:
+        """Ither over the enemies in my actors FOV."""
+        my_fov = self.actor.get_fov()
+        for other in g.world.map.actors:
+            if other.faction == self.actor.faction:
+                continue
+            if not my_fov[other.xy]:
+                continue
+            yield other
+
+    def perform(self) -> bool:
+        targets = list(self.get_targets())
+        if targets:
+            best = min(targets, key=self.distance_to)
+            self.pathfinder = Pathfind(self.actor, best.xy)
+
+        if self.pathfinder and self.pathfinder.perform():
+            return True
+        self.pathfinder = None
+        return False
+
+
 class PlayerControl(Action):
     """Give control to the player."""
 

@@ -19,15 +19,20 @@ logger = logging.getLogger(__name__)
 class Actor(Schedulable):
     """Objects which are able to move on their own."""
 
-    ch = "@"
+    ch = "X"
     fg = (0xFF, 0xFF, 0xFF)
     default_ai: Type[engine.actions.Action] = engine.actions.DefaultAI
+    faction = "hostile"
 
-    def __init__(self, x: int, y: int, *, ai: Optional[Type[engine.actions.Action]] = None):
+    def __init__(
+        self, x: int, y: int, *, ai: Optional[Type[engine.actions.Action]] = None, faction: Optional[str] = None
+    ):
         self.x = x
         self.y = y
         self.hp = 10
         self.ai = ai(self) if ai is not None else self.default_ai(self)
+        if faction is not None:
+            self.faction = faction
 
     def on_turn(self) -> None:
         assert self.ai.actor is self
@@ -54,10 +59,17 @@ class Actor(Schedulable):
         )
 
 
+class Player(Actor):
+    default_ai = engine.actions.PlayerControl
+    ch = "@"
+    faction = "player"
+
+
 class Bomb(Actor):
     """Counts down to zero and then deletes nearby actors."""
 
-    default_ai = engine.actions.IdleAction
+    faction = "player"
+    default_ai: Type[engine.actions.Action] = engine.actions.IdleAction
 
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
@@ -72,6 +84,7 @@ class Bomb(Actor):
                 g.world.map.remove_actor(actor)
 
     def on_turn(self) -> None:
+        super().on_turn()
         self.timer -= 1
         if self.timer < 0:
             self.explode()
@@ -85,7 +98,8 @@ class Bomb(Actor):
 
 
 class Totem(Actor):
-    default_ai = engine.actions.IdleAction
+    default_ai: Type[engine.actions.Action] = engine.actions.IdleAction
+    faction = "player"
 
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
@@ -96,3 +110,8 @@ class Totem(Actor):
         for y in range(self.y - 2, self.y + 3):
             for x in range(self.x - 2, self.x + 3):
                 effect.apply(x, y)
+
+
+class FlyingBomb(Bomb):
+    faction = "player"
+    default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy

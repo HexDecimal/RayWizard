@@ -29,7 +29,7 @@ class World:
             engine.spells.Beam(name="Heat beam", effect=engine.effects.Heat()),
             engine.spells.PlaceActor(name="Place totem", spawn=engine.actor.Totem),
             engine.spells.Blast(name="Heat blast", effect=engine.effects.Heat(), range=5),
-            None,
+            engine.spells.PlaceActor(name="Seeking bomb", spawn=engine.actor.FlyingBomb),
             None,
             None,
             None,

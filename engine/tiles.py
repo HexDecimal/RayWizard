@@ -10,8 +10,7 @@ TILE_DT = np.dtype(
     [
         ("move_cost", np.uint8),
         ("transparent", bool),
-        ("light", tile_graphic),
-        ("dark", tile_graphic),
+        ("graphic", tile_graphic),
     ]
 )
 
@@ -21,8 +20,7 @@ class Tile(NamedTuple):
 
     move_cost: int
     transparent: bool
-    light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
-    dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
+    graphic: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
 
     def as_np(self) -> np.ndarray:
         """Return this tile as an array scaler."""
@@ -32,33 +30,28 @@ class Tile(NamedTuple):
 DEFAULT = Tile(
     move_cost=0,
     transparent=False,
-    light=(ord(" "), (255, 255, 255), (130, 110, 50)),
-    dark=(ord(" "), (255, 255, 255), (0, 0, 100)),
+    graphic=(ord(" "), (255, 255, 255), (0, 0, 100)),
 )
 
 WALL = Tile(
     move_cost=0,
     transparent=False,
-    light=(ord(" "), (130, 110, 50), (200, 180, 50)),
-    dark=(ord(" "), (25, 25, 75), (50, 50, 100)),
+    graphic=(ord(" "), (25, 25, 75), (50, 50, 100)),
 )
 FLOOR = Tile(
     move_cost=1,
     transparent=True,
-    light=(ord("."), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("."), (25, 25, 75), (50, 50, 150)),
+    graphic=(ord("."), (25, 25, 75), (50, 50, 150)),
 )
 
 WATER = Tile(
     move_cost=0,
     transparent=True,
-    light=(ord("~"), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0x10, 0xFF)),
+    graphic=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0x10, 0xFF)),
 )
 
 ICE_FLOOR = Tile(
     move_cost=1,
     transparent=True,
-    light=(ord("+"), (130, 110, 50), (200, 180, 50)),
-    dark=(ord("+"), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
+    graphic=(ord("+"), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
 )

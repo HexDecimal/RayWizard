@@ -63,9 +63,10 @@ class Map:
         self.height = height
         self.tiles = np.empty((width, height), TILE_DT, order="F")
         self.tiles[:] = engine.tiles.DEFAULT
+        self.memory: np.ndarray = np.full((width, height), engine.rendering.SHROUD, order="F")
         self.actors: Set[engine.actor.Actor] = set()
         self.schedule: Deque[engine.sched.Schedulable] = collections.deque()
-        self.camera = Camera(0, 0)
+        self.camera: Camera = Camera(0, 0)
 
     def add_actor(self, actor: engine.actor.Actor) -> None:
         assert actor not in self.actors

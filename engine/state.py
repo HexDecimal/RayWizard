@@ -114,6 +114,8 @@ class State(tcod.event.EventDispatch[None]):
             self.cmd_cast(HOTBAR_KEYS[event.sym])
         elif __debug__ and event.sym == tcod.event.K_F2:
             self.debug_regenerate_map()
+        elif __debug__ and event.sym == tcod.event.K_F3:
+            g.debug_fullbright = not g.debug_fullbright
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         """Exit the program a quickly as possible."""

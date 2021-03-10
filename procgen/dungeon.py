@@ -152,9 +152,11 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     # Add actors to rooms.
     for room in rooms[1:]:
         gm.add_actor(engine.actor.Actor(*room.center))
+        engine.rendering.debug_map(gm)
 
     # Add player to the first room.
     model.player = engine.actor.Actor(*rooms[0].center, ai=engine.actions.PlayerControl)
     gm.add_actor(model.player)
+    engine.rendering.debug_map(gm)
 
     return gm

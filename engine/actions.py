@@ -85,10 +85,11 @@ class MoveAction(ActionWithDir):
         if self.direction == (0, 0):
             return IdleAction(self.actor).perform()
         xy = self.target_xy
-        if not g.world.map.is_blocked(*xy):
-            self.actor.x, self.actor.y = xy
-            return True
-        return False
+        if g.world.map.is_blocked(*xy):
+            return False
+        # Perform the move.
+        self.actor.x, self.actor.y = xy
+        return True
 
 
 class PlaceActor(ActionWithDir):

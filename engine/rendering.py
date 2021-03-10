@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import tcod
@@ -17,17 +17,33 @@ SHROUD = np.asarray((ord(" "), (0x40, 0x40, 0x40), (0x00, 0x00, 0x00)), dtype=ti
 "The clear graphic before drawing world tiles."
 
 
-def render_tiles(shape: Tuple[int, int]) -> np.ndarray:
-    """Return a Console.tilese_rgb compatiable array of world tiles.
+def render_map(map_: engine.map.Map, world_view: Optional[Tuple[slice, slice]], fullbright: bool = True) -> np.ndarray:
+    """Return a Console.tilese_rgb compatiable array of the map.
+
+    `map_` is the Map object to render.
 
     `shape` is the (width, height) of the returned array.
 
-    This array is in Fortran order and is centered over the world camera.
+    If `fullbright` is True then everything is visbile, otherwise the player FOV is used.
+
+    This is a full rendering of the map, including any objects.
     """
-    map_ = g.world.map
-    output = np.full(shape, SHROUD, order="F")
-    screen_view, world_view = g.world.map.camera.get_views((map_.width, map_.height), shape)
-    output[screen_view] = map_.tiles["dark"][world_view]
+    if not world_view:
+        world_view = slice(0, map_.width), slice(0, map_.height)
+    output: np.ndarray = map_.tiles["graphic"][world_view].copy()
+
+    # Render all actors.
+    cam_x, cam_y = world_view[0].start, world_view[1].start
+    for actor in map_.actors:
+        x = actor.x - cam_x
+        y = actor.y - cam_y
+        if 0 <= x < output.shape[0] and 0 <= y < output.shape[1]:
+            output[["ch", "fg"]][x, y] = ord(actor.ch), actor.fg
+
+    if fullbright:
+        return output
+
+    output = np.where(g.world.player.get_fov()[world_view], output, g.world.map.memory[world_view])
     return output
 
 
@@ -38,8 +54,9 @@ def debug_map(map_: engine.map.Map, sleep_time: float = 0) -> None:
     for ev in tcod.event.get():
         if isinstance(ev, tcod.event.KeyDown):
             g.debug_dungeon_generation = False
+    g.world.map = map_
     console = tcod.Console(map_.width, map_.height, order="F")
-    console.tiles_rgb[:] = map_.tiles["dark"]
+    console.tiles_rgb[:] = render_map(map_, world_view=None, fullbright=True)
     g.context.present(console)
     time.sleep(sleep_time)
 
@@ -75,17 +92,11 @@ def render_log(log_console: tcod.console.Console) -> None:
 
 def render_main(console: tcod.console.Console) -> None:
     """Rendeer the main view.  With the world tiles, any objects, and the UI."""
-    # Render world tiles.
+    # Render map view.
     console_shape = (console.width - UI_SIZE[0], console.height - UI_SIZE[1])
-    console.tiles_rgb[: console_shape[0], : console_shape[1]] = render_tiles(console_shape)
-
-    # Render all actors.
-    cam_x, cam_y = g.world.map.camera.get_left_top_pos(console_shape)
-    for actor in g.world.map.actors:
-        x = actor.x - cam_x
-        y = actor.y - cam_y
-        if 0 <= x < console_shape[0] and 0 <= y < console_shape[1]:
-            console.print(x, y, actor.ch, fg=actor.fg)
+    screen_view, world_view = g.world.map.camera.get_views(g.world.map.tiles.shape, console_shape)
+    console.tiles_rgb[: console_shape[0], : console_shape[1]] = SHROUD
+    console.tiles_rgb[screen_view] = render_map(g.world.map, world_view, fullbright=g.debug_fullbright)
 
     render_slots(console)
 

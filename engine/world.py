@@ -5,6 +5,8 @@ import logging
 import random
 from typing import List, Optional
 
+import numpy as np
+
 import engine.actions
 import engine.actor
 import engine.map
@@ -44,6 +46,12 @@ class World:
     def loop(self) -> None:
         while self.player in self.map.actors:
             next_obj = self.map.schedule[0]
+            if next_obj is self.player:
+                # Player remembers visible tiles.
+                map_tiles = engine.rendering.render_map(self.map, world_view=None, fullbright=True)
+                map_tiles["fg"] //= 4
+                map_tiles["bg"] //= 4
+                np.putmask(self.map.memory, self.player.get_fov(), map_tiles)
             next_obj.on_turn()
             if self.map.schedule and self.map.schedule[0] is next_obj:
                 self.map.schedule.rotate(1)

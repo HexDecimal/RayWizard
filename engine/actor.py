@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Type
+from typing import Optional, Tuple, Type
+
+import numpy as np
+import tcod
 
 import engine.actions
 import engine.map
@@ -37,6 +40,17 @@ class Actor(Schedulable):
         if self.hp <= 0:
             g.world.report(f"{self} dies.")
             g.world.map.remove_actor(self)
+
+    @property
+    def xy(self) -> Tuple[int, int]:
+        """This actors current position."""
+        return self.x, self.y
+
+    def get_fov(self) -> np.ndarray:
+        """Return a bool array of tiles this actor can see."""
+        return tcod.map.compute_fov(
+            transparency=g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
+        )
 
 
 class Bomb(Actor):

@@ -40,7 +40,7 @@ class Actor(Schedulable):
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
-        damage = 5  # Placeholder.
+        damage = effect.power  # Placeholder.
         g.world.report(f"{self} takes {damage} damage.")
         self.hp -= damage
         if self.hp <= 0:

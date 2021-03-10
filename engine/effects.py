@@ -6,6 +6,9 @@ import g
 
 
 class Effect:
+    def __init__(self, power: int = 5):
+        self.power = power
+
     def apply(self, x: int, y: int) -> None:
         for actor in [actor for actor in g.world.map.actors if x == actor.x and y == actor.y]:
             actor.apply_effect(self)

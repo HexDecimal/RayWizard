@@ -32,3 +32,13 @@ class Beam(Spell):
 
     def cast(self, actor: engine.actor.Actor) -> bool:
         return engine.actions.Beam(actor, effect=self.effect).perform()
+
+
+class Blast(Spell):
+    def __init__(self, *, effect: engine.effects.Effect, range: int, **kargs: Any):
+        self.effect = effect
+        self.range = range
+        super().__init__(**kargs)
+
+    def cast(self, actor: engine.actor.Actor) -> bool:
+        return engine.actions.Blast(actor, effect=self.effect, range=self.range).perform()

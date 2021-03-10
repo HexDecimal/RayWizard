@@ -117,6 +117,29 @@ class Beam(ActionWithDir, ActionWithEffect):
         return True
 
 
+class WithRange(Action):
+    def __init__(self, actor: engine.actor.Actor, range: int, **kargs: Any):
+        self.range = range
+        super().__init__(actor=actor, **kargs)  # type: ignore
+
+    def trace_range(self, with_center: bool) -> Iterator[Tuple[int, int]]:
+        for y in range(self.actor.y - self.range, self.actor.y + self.range + 1):
+            for x in range(self.actor.x - self.range, self.actor.x + self.range + 1):
+                if not with_center and x == self.actor.x and y == self.actor.y:
+                    continue
+                if not g.world.map.in_bounds(x, y):
+                    continue
+                yield x, y
+
+
+class Blast(ActionWithEffect, WithRange):
+    def perform(self) -> bool:
+        """Trace the area around the actor and apply the effect."""
+        for xy in self.trace_range(with_center=False):
+            self.effect.apply(*xy)
+        return True
+
+
 class RandomStep(Action):
     """Move in a random direction."""
 

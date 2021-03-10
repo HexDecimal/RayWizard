@@ -28,7 +28,7 @@ class World:
             engine.spells.Beam(name="Ice beam", effect=engine.effects.Cold()),
             engine.spells.Beam(name="Heat beam", effect=engine.effects.Heat()),
             engine.spells.PlaceActor(name="Place totem", spawn=engine.actor.Totem),
-            None,
+            engine.spells.Blast(name="Heat blast", effect=engine.effects.Heat(), range=5),
             None,
             None,
             None,

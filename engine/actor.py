@@ -21,12 +21,13 @@ class Actor(Schedulable):
 
     ch = "@"
     fg = (0xFF, 0xFF, 0xFF)
+    default_ai: Type[engine.actions.Action] = engine.actions.DefaultAI
 
     def __init__(self, x: int, y: int, *, ai: Optional[Type[engine.actions.Action]] = None):
         self.x = x
         self.y = y
         self.hp = 10
-        self.ai = ai(self) if ai is not None else engine.actions.DefaultAI(self)
+        self.ai = ai(self) if ai is not None else self.default_ai(self)
 
     def on_turn(self) -> None:
         assert self.ai.actor is self
@@ -56,6 +57,8 @@ class Actor(Schedulable):
 class Bomb(Actor):
     """Counts down to zero and then deletes nearby actors."""
 
+    default_ai = engine.actions.IdleAction
+
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
         self.timer = 5
@@ -82,6 +85,8 @@ class Bomb(Actor):
 
 
 class Totem(Actor):
+    default_ai = engine.actions.IdleAction
+
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
         self.ch = "&"

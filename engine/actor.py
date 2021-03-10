@@ -58,6 +58,13 @@ class Actor(Schedulable):
             transparency=g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
         )
 
+    def bump(self, other: Actor) -> bool:
+        """Called when one actor bumps into another.
+
+        Should return False if nothing that should take a turn has happened.
+        """
+        return False
+
 
 class Player(Actor):
     default_ai = engine.actions.PlayerControl
@@ -116,17 +123,17 @@ class FlyingBomb(Bomb):
     faction = "player"
     default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy
 
+
 class HunterEnemy(Actor):
     faction = "hostile"
     default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy
-    #does two damage
-    def attack(self) -> None:
-        # Should be replaced by an effect.
-        for actor in list(g.world.map.actors):
-            dist = abs(actor.x - self.x) + abs(actor.y - self.y)
-            if dist <= 1:
-                if actor.faction != self.faction:
-                    actor.hp = actor.hp - 2
+    attack_effect = engine.effects.PlaceAcid(power=2)  # does two damage
+
+    def bump(self, other: Actor) -> bool:
+        if other.faction != self.faction:
+            self.attack_effect.apply(*other.xy)
+            return True
+        return False
 
     def on_turn(self) -> None:
         super().on_turn()

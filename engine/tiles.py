@@ -65,5 +65,5 @@ ACID = Tile(
     move_cost=1,
     transparent=True,
     graphic=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0xB0, 0x10)),
-    effect=Effect(power=3),
+    effect=Effect(power=1),
 )

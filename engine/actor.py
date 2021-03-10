@@ -115,3 +115,18 @@ class Totem(Actor):
 class FlyingBomb(Bomb):
     faction = "player"
     default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy
+
+class HunterEnemy(Actor):
+    faction = "hostile"
+    default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy
+    #does two damage
+    def attack(self) -> None:
+        # Should be replaced by an effect.
+        for actor in list(g.world.map.actors):
+            dist = abs(actor.x - self.x) + abs(actor.y - self.y)
+            if dist <= 1:
+                if actor.faction != self.faction:
+                    actor.hp = actor.hp - 2
+
+    def on_turn(self) -> None:
+        super().on_turn()

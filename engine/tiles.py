@@ -32,48 +32,44 @@ class Tile(NamedTuple):
         return np.asarray(self, dtype=TILE_DT)
 
 
-DEFAULT = Tile(
+# Tiles color scheme:
+# https://paletton.com/#uid=7000H0kmOpCsM5UrxfxiMyhdzSk
+DEFAULT = WALL = Tile(
     move_cost=0,
     transparent=False,
-    graphic=(ord(" "), (255, 255, 255), (0, 0, 100)),
-)
-
-WALL = Tile(
-    move_cost=0,
-    transparent=False,
-    graphic=(ord(" "), (25, 25, 75), (50, 50, 100)),
+    graphic=(ord(" "), (255, 255, 255), (47, 29, 5)),
 )
 FLOOR = Tile(
     move_cost=1,
     transparent=True,
-    graphic=(ord("."), (25, 25, 75), (50, 50, 150)),
+    graphic=(ord("."), (255, 190, 105), (124, 77, 17)),
 )
 RUBBLE = Tile(
     move_cost=1,
     transparent=True,
-    graphic=(ord(","), (25, 25, 75), (50, 50, 150)),
+    graphic=(ord(","), (0, 0, 0), (124, 77, 17)),
 )
 
 WATER = Tile(
     move_cost=0,
     transparent=True,
-    graphic=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0x10, 0xFF)),
+    graphic=(ord("~"), (139, 192, 230), (15, 52, 79)),
 )
 
 ICE_FLOOR = Tile(
     move_cost=1,
     transparent=True,
-    graphic=(ord("+"), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
+    graphic=(ord("+"), (0xFF, 0xFF, 0xFF), (77, 131, 170)),
 )
 ICE_WALL = Tile(
     move_cost=0,
     transparent=True,
-    graphic=(ord("="), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
+    graphic=(ord("="), (0xFF, 0xFF, 0xFF), (77, 131, 170)),
 )
 
 ACID = Tile(
     move_cost=1,
     transparent=True,
-    graphic=(ord("~"), (0x40, 0x40, 0x40), (0x10, 0xB0, 0x10)),
+    graphic=(ord("°"), (0xFF, 0xFF, 0xFF), (86, 208, 86)),
     effect=Effect(power=1),
 )

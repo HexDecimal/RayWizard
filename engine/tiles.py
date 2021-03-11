@@ -48,6 +48,11 @@ FLOOR = Tile(
     transparent=True,
     graphic=(ord("."), (25, 25, 75), (50, 50, 150)),
 )
+RUBBLE = Tile(
+    move_cost=1,
+    transparent=True,
+    graphic=(ord(","), (25, 25, 75), (50, 50, 150)),
+)
 
 WATER = Tile(
     move_cost=0,

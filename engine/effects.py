@@ -32,3 +32,10 @@ class PlaceAcid(Effect):
     def apply(self, x: int, y: int) -> None:
         super().apply(x, y)
         g.world.map.tiles[x, y] = engine.tiles.ACID
+
+
+class Dig(Effect):
+    def apply(self, x: int, y: int) -> None:
+        super().apply(x, y)
+        if g.world.map.tiles[x, y] == engine.tiles.WALL.as_np():
+            g.world.map.tiles[x, y] = engine.tiles.RUBBLE

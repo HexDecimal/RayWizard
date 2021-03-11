@@ -89,11 +89,9 @@ class Bomb(Actor):
         self.ch = str(self.timer)
 
     def explode(self) -> None:
-        # Should be replaced by an effect.
-        for actor in list(g.world.map.actors):
-            dist = abs(actor.x - self.x) + abs(actor.y - self.y)
-            if dist <= 2:
-                g.world.map.remove_actor(actor)
+        engine.actions.Blast(self, effect=engine.effects.Dig(power=10), range=2).perform()
+        if self in g.world.map.actors:
+            g.world.map.remove_actor(self)
 
     def on_turn(self) -> None:
         super().on_turn()

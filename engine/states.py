@@ -19,6 +19,39 @@ class HelloWorld(State):
         console.print(0, 0, "Hello World")
 
 
+HELP_TEXT = """\
+To move around use the number pad keys, VI keys, or the arrow keys along with home/end/pageup/pagedown.
+
+ 7 8 9  y k u
+ 4 5 6  h . l
+ 1 2 3  b j n
+
+The period key or keypad 5 can be used to wait a turn.
+
+The standard numbers (0..9) are used to select spells.
+
+Press esc to exit this screen and cancel out of other actions.
+"""
+
+
+class Help(State):
+    def on_draw(self, console: tcod.console.Console) -> None:
+        engine.rendering.render_main(console)
+        console.tiles_rgb["fg"] //= 16
+        console.tiles_rgb["bg"] //= 16
+        width, height = 60, 32
+
+        console.print_box(
+            (console.width - width) // 2,
+            (console.height - height) // 2,
+            width,
+            height,
+            HELP_TEXT,
+            fg=engine.rendering.TEXT_COLOR,
+            bg=None,
+        )
+
+
 class InGame(State):
     """The normal in-game state.  Where the player has control over their own actor object."""
 
@@ -51,6 +84,9 @@ class InGame(State):
             g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
             g.states.pop()
             break
+
+    def cmd_help(self) -> None:
+        Help().run_modal()
 
     def debug_regenerate_map(self) -> None:
         g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level)

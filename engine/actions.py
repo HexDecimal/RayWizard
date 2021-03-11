@@ -23,6 +23,20 @@ class Action:
         super().__init__()
         self.actor = actor  # The actor performing this action.
 
+    def distance_to(self, other: engine.actor.Actor) -> int:
+        """Return the squared distance to another actor."""
+        return (self.actor.x - other.x) ** 2 + (self.actor.y - other.y) ** 2
+
+    def get_targets(self) -> Iterator[engine.actor.Actor]:
+        """Ither over the enemies in my actors FOV."""
+        my_fov = self.actor.get_fov()
+        for other in g.world.map.actors:
+            if other.faction == self.actor.faction:
+                continue
+            if not my_fov[other.xy]:
+                continue
+            yield other
+
     def perform(self) -> bool:
         """Perform the action and return its status.
 
@@ -213,19 +227,6 @@ class SeekEnemy(Action):
         self.pathfinder: Optional[Pathfind] = None
         super().__init__(actor)
 
-    def distance_to(self, other: engine.actor.Actor) -> int:
-        """Return the squared distance to another actor."""
-        return (self.actor.x - other.x) ** 2 + (self.actor.y - other.y) ** 2
-
-    def get_targets(self) -> Iterator[engine.actor.Actor]:
-        """Ither over the enemies in my actors FOV."""
-        my_fov = self.actor.get_fov()
-        for other in g.world.map.actors:
-            if other.faction == self.actor.faction:
-                continue
-            if not my_fov[other.xy]:
-                continue
-            yield other
 
     def perform(self) -> bool:
         targets = list(self.get_targets())
@@ -248,3 +249,21 @@ class PlayerControl(Action):
         g.world.map.camera = engine.map.Camera(self.actor.x, self.actor.y)
         engine.states.InGame().run_modal()
         return True
+
+class RangedIdle(Action):
+    def perform(self) -> bool:
+        targets = list(self.get_targets())
+        if targets:
+            best = min(targets, key=self.distance_to)
+            self.bolt(best)
+        else:
+            return DefaultAI(self.actor).perform()
+
+    def bolt(self, other: Actor) -> bool:#don't know if this will work?
+        if other.faction == self.actor.faction:
+            self.attack_effect.apply(*other.xy)
+            for y in range(other.y - 2, other.y + 2):
+                for x in range(other.x - 2, other.x + 2):
+                    self.attack_effect.apply(x,y)
+            return True
+        return False

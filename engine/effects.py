@@ -26,6 +26,8 @@ class Heat(Effect):
         super().apply(x, y)
         if g.world.map.tiles[x, y] == engine.tiles.ICE_FLOOR.as_np():
             g.world.map.tiles[x, y] = engine.tiles.WATER
+        if g.world.map.tiles[x, y] == engine.tiles.ICE_WALL.as_np():
+            g.world.map.tiles[x, y] = engine.tiles.WATER
 
 
 class PlaceAcid(Effect):

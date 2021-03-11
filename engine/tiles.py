@@ -65,6 +65,11 @@ ICE_FLOOR = Tile(
     transparent=True,
     graphic=(ord("+"), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
 )
+ICE_WALL = Tile(
+    move_cost=0,
+    transparent=True,
+    graphic=(ord("="), (0xFF, 0xFF, 0xFF), (0x22, 0xFF, 0xFF)),
+)
 
 ACID = Tile(
     move_cost=1,

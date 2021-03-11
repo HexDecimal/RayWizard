@@ -272,6 +272,7 @@ class RangedIdle(ActionWithEffect, WithRange):
         targets = list(self.get_targets())
         if targets:
             nearest = min(targets, key=self.distance_to)
+            self.actor.skip_turns += 5
             return Ball(self.actor, range=self.range, effect=self.effect, target_xy=nearest.xy).perform()
         else:
             return DefaultAI(self.actor).perform()

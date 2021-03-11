@@ -34,6 +34,7 @@ class Actor(Schedulable):
         self.x = x
         self.y = y
         self.hp = 10
+        self.skip_turns = 0  # Add to this to skip this actors turns.
         if faction is not None:
             self.faction = faction
 

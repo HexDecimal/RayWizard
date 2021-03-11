@@ -51,7 +51,10 @@ class World:
                 map_tiles["fg"] //= 4
                 map_tiles["bg"] //= 4
                 np.putmask(self.map.memory, self.player.get_fov(), map_tiles)
-            next_obj.on_turn()
+            if next_obj.skip_turns == 0:
+                next_obj.on_turn()
+            else:
+                next_obj.skip_turns -= 1
             if self.map.schedule and self.map.schedule[0] is next_obj:
                 self.map.schedule.rotate(1)
                 # All end-of-turn effects.

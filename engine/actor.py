@@ -35,11 +35,20 @@ class Actor(Schedulable):
         self.y = y
         self.hp = 10
         self.skip_turns = 0  # Add to this to skip this actors turns.
+        self.ai: Optional[engine.actions.Action] = None  # Cached AI action.
         if faction is not None:
             self.faction = faction
 
+    def default_ai(self) -> engine.actions.Action:
+        """Return the action that this actor should perform."""
+        return engine.actions.IdleAction(self)
+
     def on_turn(self) -> None:
-        raise NotImplementedError("on_turn must be overridden.")
+        """Perform this actors action until False is returned, then refresh the action."""
+        if not self.ai:
+            self.ai = self.default_ai()
+        if not self.ai.perform():
+            self.ai = None
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
@@ -73,8 +82,8 @@ class Player(Actor):
     ch = "@"
     faction = "player"
 
-    def on_turn(self) -> None:
-        engine.actions.PlayerControl(self).perform()
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.PlayerControl(self)
 
 
 class Bomb(Actor):
@@ -93,6 +102,7 @@ class Bomb(Actor):
             g.world.map.remove_actor(self)
 
     def on_turn(self) -> None:
+        super().on_turn()
         self.timer -= 1
         if self.timer < 0:
             self.explode()
@@ -112,9 +122,6 @@ class Totem(Actor):
         super().__init__(x, y)
         self.ch = "&"
 
-    def on_turn(self) -> None:
-        pass
-
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         g.world.map.remove_actor(self)
         for y in range(self.y - 2, self.y + 3):
@@ -125,9 +132,8 @@ class Totem(Actor):
 class FlyingBomb(Bomb):
     faction = "player"
 
-    def on_turn(self) -> None:
-        super().on_turn()
-        engine.actions.SeekEnemy(self).perform()
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.SeekEnemy(self)
 
 
 class HunterEnemy(Actor):
@@ -140,19 +146,19 @@ class HunterEnemy(Actor):
             return True
         return False
 
-    def on_turn(self) -> None:
-        engine.actions.SeekEnemy(self).perform()
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.SeekEnemy(self)
 
 
 class HeatBoltEnemy(Actor):
     faction = "hostile"
 
-    def on_turn(self) -> None:
-        engine.actions.RangedIdle(self, effect=engine.effects.Heat(power=2), range=2).perform()
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.RangedIdle(self, effect=engine.effects.Heat(power=2), range=2)
 
 
 class ColdBoltEnemy(Actor):
     faction = "hostile"
 
-    def on_turn(self) -> None:
-        engine.actions.RangedIdle(self, effect=engine.effects.Cold(power=1), range=2).perform()
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.RangedIdle(self, effect=engine.effects.Cold(power=1), range=2)

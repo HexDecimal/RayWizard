@@ -288,6 +288,9 @@ class Explore(Action):
 
     def perform(self) -> bool:
         cost = self.actor.get_move_cost()
+        for other in g.world.map.actors:  # Move around actors.
+            cost[other.xy] = 0
+        cost[self.actor.xy] = 0
         cost[g.world.map.tiles["dangerous"]] = 0  # Avoid acid tiles.
         distance = tcod.path.maxarray(cost.shape, order="F")
         unexpored = ~g.world.map.explored

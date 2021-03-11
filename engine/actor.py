@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import tcod
@@ -21,19 +21,19 @@ class Actor(Schedulable):
 
     ch = "X"
     fg = (0xFF, 0xFF, 0xFF)
+    hp: int = 10
     faction = "hostile"
+    share_vision: bool = False  # If True this object shares vision with its own faction.
 
     def __init__(
         self,
         x: int,
         y: int,
         *,
-        ai: Optional[Callable[[Actor], engine.actions.Action]] = None,
         faction: Optional[str] = None,
     ):
         self.x = x
         self.y = y
-        self.hp = 10
         self.skip_turns = 0  # Add to this to skip this actors turns.
         self.ai: Optional[engine.actions.Action] = None  # Cached AI action.
         if faction is not None:
@@ -77,8 +77,12 @@ class Actor(Schedulable):
         """This actors current position."""
         return self.x, self.y
 
-    def get_fov(self) -> np.ndarray:
-        """Return a bool array of tiles this actor can see."""
+    def get_fov(self, plus_shared: bool = True) -> np.ndarray:
+        """Return a bool array of tiles this actor can see.
+
+        If `plus_shared` is True then shared vision is also added.  This parameter is used to prevent infinite
+        recursion.
+        """
         visible = tcod.map.compute_fov(
             transparency=g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
         )
@@ -86,6 +90,11 @@ class Actor(Schedulable):
             visible |= tcod.map.compute_fov(
                 transparency=~g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
             )
+        if plus_shared:
+            for actor in g.world.map.actors:
+                if actor is self or actor.share_vision is False or actor.faction != self.faction:
+                    continue
+                visible |= actor.get_fov(plus_shared=False)
         return visible
 
     def get_move_cost(self) -> np.ndarray:
@@ -106,6 +115,16 @@ class Player(Actor):
 
     def default_ai(self) -> engine.actions.Action:
         return engine.actions.PlayerControl(self)
+
+
+class Scout(Actor):
+    ch = "s"
+    faction = "player"
+    share_vision = True
+    hp = 1
+
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.Explore(self)
 
 
 class Bomb(Actor):

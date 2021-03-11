@@ -1,7 +1,7 @@
 """The collection of player spells."""
 from __future__ import annotations
 
-from typing import Any, Type
+from typing import Any, Optional, Type
 
 import engine.actions
 import engine.actor
@@ -9,7 +9,9 @@ import engine.effects
 
 
 class Spell:
-    def __init__(self, *, name: str, cooldown: int):
+    desc = "Spell desc"
+
+    def __init__(self, *, name: str, cooldown: int, desc: Optional[str] = None):
         self.name = name
         self.cooldown_length = cooldown
         self.cooldown_left = 0
@@ -44,3 +46,15 @@ class Blast(Spell):
 
     def cast(self, actor: engine.actor.Actor) -> bool:
         return engine.actions.Blast(actor, effect=self.effect, range=self.range).perform()
+
+
+class EarthVision(Spell):
+    desc = "Reveals areas behind walls."
+
+    def __init__(self, *, length: int, **kargs: Any):
+        self.length = length
+        super().__init__(**kargs)
+
+    def cast(self, actor: engine.actor.Actor) -> bool:
+        actor.status["earth vision"] = self.length
+        return True

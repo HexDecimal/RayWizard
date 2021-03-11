@@ -100,3 +100,10 @@ class Map:
             if actor.x == x and actor.y == y:
                 return actor  # Space taken by actor.
         return False
+
+    def reveal(self, touched: np.ndarray) -> None:
+        """Reveal the `touched` tiles."""
+        map_tiles = engine.rendering.render_map(self, world_view=None, fullbright=True)
+        map_tiles["fg"] //= 4
+        map_tiles["bg"] //= 4
+        np.putmask(self.memory, touched, map_tiles)

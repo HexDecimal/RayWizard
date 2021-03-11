@@ -5,8 +5,6 @@ import logging
 import random
 from typing import List, Optional
 
-import numpy as np
-
 import engine.actor
 import engine.map
 import engine.spells
@@ -30,7 +28,7 @@ class World:
             engine.spells.PlaceActor(name="Seeking bomb", cooldown=12, spawn=engine.actor.FlyingBomb),
             None,
             None,
-            None,
+            engine.spells.EarthVision(name="Earth Vision", cooldown=24, length=12),
             None,
         ]  # Spells equipped to the hotbar.
         assert len(self.spell_slots) == 10
@@ -46,11 +44,7 @@ class World:
         while self.player in self.map.actors:
             next_obj = self.map.schedule[0]
             if next_obj is self.player:
-                # Player remembers visible tiles.
-                map_tiles = engine.rendering.render_map(self.map, world_view=None, fullbright=True)
-                map_tiles["fg"] //= 4
-                map_tiles["bg"] //= 4
-                np.putmask(self.map.memory, self.player.get_fov(), map_tiles)
+                self.map.reveal(self.player.get_fov())  # Player remembers visible tiles.
             if next_obj.skip_turns == 0:
                 try:
                     next_obj.on_turn()
@@ -64,10 +58,7 @@ class World:
                 self.map.schedule.rotate(1)
                 # All end-of-turn effects.
                 if isinstance(next_obj, engine.actor.Actor):
-                    # Apply tile to the actor.
-                    tile_effect: Optional[engine.effects.Effect] = self.map.tiles["effect"][next_obj.xy]
-                    if tile_effect:
-                        tile_effect.apply(*next_obj.xy)
+                    next_obj.on_end_turn()
                 if next_obj is self.player:
                     # End of player's turn.
                     for spell in self.spell_slots:

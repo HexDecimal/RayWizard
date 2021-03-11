@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
 import tcod
@@ -38,6 +38,7 @@ class Actor(Schedulable):
         self.ai: Optional[engine.actions.Action] = None  # Cached AI action.
         if faction is not None:
             self.faction = faction
+        self.status: Dict[str, int] = {}  # Status effects: Dict[status_name: time_left]
 
     def default_ai(self) -> engine.actions.Action:
         """Return the action that this actor should perform."""
@@ -49,6 +50,18 @@ class Actor(Schedulable):
             self.ai = self.default_ai()
         if not self.ai.perform():
             self.ai = None
+
+    def on_end_turn(self) -> None:
+        """Called after a turn has passed."""
+        for name in list(self.status):
+            self.status[name] -= 1
+            if self.status[name] == 0:
+                del self.status[name]
+                g.world.report(f"{name.title()} has worn off.")
+        # Apply tile to the actor.
+        tile_effect: Optional[engine.effects.Effect] = g.world.map.tiles["effect"][self.xy]
+        if tile_effect:
+            tile_effect.apply(*self.xy)
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
@@ -66,9 +79,14 @@ class Actor(Schedulable):
 
     def get_fov(self) -> np.ndarray:
         """Return a bool array of tiles this actor can see."""
-        return tcod.map.compute_fov(
+        visible = tcod.map.compute_fov(
             transparency=g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
         )
+        if "earth vision" in self.status:
+            visible |= tcod.map.compute_fov(
+                transparency=~g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
+            )
+        return visible
 
     def bump(self, other: Actor) -> bool:
         """Called when one actor bumps into another.

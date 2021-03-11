@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 import tcod
@@ -21,7 +21,6 @@ class Actor(Schedulable):
 
     ch = "X"
     fg = (0xFF, 0xFF, 0xFF)
-    default_ai: Callable[..., engine.actions.Action] = engine.actions.DefaultAI
     faction = "hostile"
 
     def __init__(
@@ -35,13 +34,11 @@ class Actor(Schedulable):
         self.x = x
         self.y = y
         self.hp = 10
-        self.ai = ai(self) if ai is not None else self.default_ai(self)
         if faction is not None:
             self.faction = faction
 
     def on_turn(self) -> None:
-        assert self.ai.actor is self
-        self.ai.perform()
+        raise NotImplementedError("on_turn must be overridden.")
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
@@ -72,16 +69,17 @@ class Actor(Schedulable):
 
 
 class Player(Actor):
-    default_ai = engine.actions.PlayerControl
     ch = "@"
     faction = "player"
+
+    def on_turn(self) -> None:
+        engine.actions.PlayerControl(self).perform()
 
 
 class Bomb(Actor):
     """Counts down to zero and then deletes nearby actors."""
 
     faction = "player"
-    default_ai: Callable[[Actor], engine.actions.Action] = engine.actions.IdleAction
 
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
@@ -94,7 +92,6 @@ class Bomb(Actor):
             g.world.map.remove_actor(self)
 
     def on_turn(self) -> None:
-        super().on_turn()
         self.timer -= 1
         if self.timer < 0:
             self.explode()
@@ -108,12 +105,14 @@ class Bomb(Actor):
 
 
 class Totem(Actor):
-    default_ai: Callable[..., engine.actions.Action] = engine.actions.IdleAction
     faction = "player"
 
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
         self.ch = "&"
+
+    def on_turn(self) -> None:
+        pass
 
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         g.world.map.remove_actor(self)
@@ -124,12 +123,14 @@ class Totem(Actor):
 
 class FlyingBomb(Bomb):
     faction = "player"
-    default_ai: Callable[..., engine.actions.Action] = engine.actions.SeekEnemy
+
+    def on_turn(self) -> None:
+        super().on_turn()
+        engine.actions.SeekEnemy(self).perform()
 
 
 class HunterEnemy(Actor):
     faction = "hostile"
-    default_ai: Callable[..., engine.actions.Action] = engine.actions.SeekEnemy
     attack_effect = engine.effects.PlaceAcid(power=2)  # does two damage
 
     def bump(self, other: Actor) -> bool:
@@ -139,18 +140,18 @@ class HunterEnemy(Actor):
         return False
 
     def on_turn(self) -> None:
-        super().on_turn()
+        engine.actions.SeekEnemy(self).perform()
 
 
 class HeatBoltEnemy(Actor):
     faction = "hostile"
-    default_ai: Any = staticmethod(
-        lambda actor: engine.actions.RangedIdle(actor, effect=engine.effects.Heat(power=2), range=2)
-    )
+
+    def on_turn(self) -> None:
+        engine.actions.RangedIdle(self, effect=engine.effects.Heat(power=2), range=2).perform()
 
 
 class ColdBoltEnemy(Actor):
     faction = "hostile"
-    default_ai: Any = staticmethod(
-        lambda actor: engine.actions.RangedIdle(actor, effect=engine.effects.Cold(power=1), range=2)
-    )
+
+    def on_turn(self) -> None:
+        engine.actions.RangedIdle(self, effect=engine.effects.Cold(power=1), range=2).perform()

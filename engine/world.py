@@ -23,12 +23,12 @@ class World:
         self.map = engine.map.Map(128, 128)
         self.rng = random.Random()
         self.spell_slots: List[Optional[engine.spells.Spell]] = [
-            engine.spells.PlaceActor(name="Place bomb", spawn=engine.actor.Bomb),
-            engine.spells.Beam(name="Ice beam", effect=engine.effects.Cold()),
-            engine.spells.Beam(name="Heat beam", effect=engine.effects.Heat()),
-            engine.spells.PlaceActor(name="Place totem", spawn=engine.actor.Totem),
-            engine.spells.Blast(name="Heat blast", effect=engine.effects.Heat(), range=5),
-            engine.spells.PlaceActor(name="Seeking bomb", spawn=engine.actor.FlyingBomb),
+            engine.spells.PlaceActor(name="Place bomb", cooldown=8, spawn=engine.actor.Bomb),
+            engine.spells.Beam(name="Ice beam", cooldown=3, effect=engine.effects.Cold(power=2)),
+            engine.spells.Beam(name="Heat beam", cooldown=8, effect=engine.effects.Heat(power=5)),
+            engine.spells.PlaceActor(name="Place totem", cooldown=8, spawn=engine.actor.Totem),
+            engine.spells.Blast(name="Heat blast", cooldown=8, effect=engine.effects.Heat(), range=5),
+            engine.spells.PlaceActor(name="Seeking bomb", cooldown=12, spawn=engine.actor.FlyingBomb),
             None,
             None,
             None,
@@ -54,8 +54,17 @@ class World:
             next_obj.on_turn()
             if self.map.schedule and self.map.schedule[0] is next_obj:
                 self.map.schedule.rotate(1)
+                # All end-of-turn effects.
                 if isinstance(next_obj, engine.actor.Actor):
+                    # Apply tile to the actor.
                     tile_effect: Optional[engine.effects.Effect] = self.map.tiles["effect"][next_obj.xy]
                     if tile_effect:
                         tile_effect.apply(*next_obj.xy)
+                if next_obj is self.player:
+                    # End of player's turn.
+                    for spell in self.spell_slots:
+                        if spell is None:
+                            continue
+                        if spell.cooldown_left:
+                            spell.cooldown_left -= 1
         logger.info("Player is dead or missing!")

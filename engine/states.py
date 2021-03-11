@@ -34,8 +34,12 @@ class InGame(State):
         spell = g.world.spell_slots[index]
         if not spell:
             return
+        if spell.cooldown_left:
+            g.world.report(f"{spell.name} is on cooldown!")
+            return
         g.world.report(f"You cast {spell.name}")
         if spell.cast(g.world.player):
+            spell.cooldown_left = spell.cooldown_length + 1
             g.states.pop()
 
     def debug_regenerate_map(self) -> None:

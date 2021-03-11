@@ -9,8 +9,10 @@ import engine.effects
 
 
 class Spell:
-    def __init__(self, *, name: str):
+    def __init__(self, *, name: str, cooldown: int):
         self.name = name
+        self.cooldown_length = cooldown
+        self.cooldown_left = 0
 
     def cast(self, actor: engine.actor.Actor) -> bool:
         raise NotImplementedError("Must be overridden.")

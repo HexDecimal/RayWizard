@@ -152,6 +152,7 @@ class HunterEnemy(Actor):
 
 class HeatBoltEnemy(Actor):
     faction = "hostile"
+    ch = "H"
 
     def default_ai(self) -> engine.actions.Action:
         return engine.actions.RangedIdle(self, effect=engine.effects.Heat(power=2), range=2)
@@ -159,6 +160,7 @@ class HeatBoltEnemy(Actor):
 
 class ColdBoltEnemy(Actor):
     faction = "hostile"
+    ch = "C"
 
     def default_ai(self) -> engine.actions.Action:
         return engine.actions.RangedIdle(self, effect=engine.effects.Cold(power=1), range=2)

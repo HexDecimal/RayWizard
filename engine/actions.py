@@ -82,6 +82,12 @@ class ActionWithDir(Action):
             yield x, y
 
 
+class WithTarget(Action):
+    def __init__(self, actor: engine.actor.Actor, target_xy: Tuple[int, int], **kargs: Any):
+        self.target_xy = target_xy
+        super().__init__(actor=actor, **kargs)  # type: ignore
+
+
 class ActionWithEffect(Action):
     def __init__(self, actor: engine.actor.Actor, effect: engine.effects.Effect, **kargs: Any):
         super().__init__(actor=actor, **kargs)  # type: ignore
@@ -140,10 +146,12 @@ class WithRange(Action):
         self.range = range
         super().__init__(actor=actor, **kargs)  # type: ignore
 
-    def trace_range(self, with_center: bool) -> Iterator[Tuple[int, int]]:
-        for y in range(self.actor.y - self.range, self.actor.y + self.range + 1):
-            for x in range(self.actor.x - self.range, self.actor.x + self.range + 1):
-                if not with_center and x == self.actor.x and y == self.actor.y:
+    def trace_range(self, with_center: bool, center: Optional[Tuple[int, int]] = None) -> Iterator[Tuple[int, int]]:
+        if center is None:
+            center = (self.actor.x, self.actor.y)
+        for y in range(center[1] - self.range, center[1] + self.range + 1):
+            for x in range(center[0] - self.range, center[0] + self.range + 1):
+                if not with_center and x == center[0] and y == center[1]:
                     continue
                 if not g.world.map.in_bounds(x, y):
                     continue
@@ -227,7 +235,6 @@ class SeekEnemy(Action):
         self.pathfinder: Optional[Pathfind] = None
         super().__init__(actor)
 
-
     def perform(self) -> bool:
         targets = list(self.get_targets())
         if targets:
@@ -250,20 +257,21 @@ class PlayerControl(Action):
         engine.states.InGame().run_modal()
         return True
 
-class RangedIdle(Action):
+
+class Ball(ActionWithEffect, WithRange, WithTarget):
+    """Apply an effect in an explostion over a point."""
+
+    def perform(self) -> bool:
+        for x, y in self.trace_range(with_center=True, center=self.target_xy):
+            self.effect.apply(x, y)
+        return True
+
+
+class RangedIdle(ActionWithEffect, WithRange):
     def perform(self) -> bool:
         targets = list(self.get_targets())
         if targets:
-            best = min(targets, key=self.distance_to)
-            self.bolt(best)
+            nearest = min(targets, key=self.distance_to)
+            return Ball(self.actor, range=self.range, effect=self.effect, target_xy=nearest.xy).perform()
         else:
             return DefaultAI(self.actor).perform()
-
-    def bolt(self, other: Actor) -> bool:#don't know if this will work?
-        if other.faction == self.actor.faction:
-            self.attack_effect.apply(*other.xy)
-            for y in range(other.y - 2, other.y + 2):
-                for x in range(other.x - 2, other.x + 2):
-                    self.attack_effect.apply(x,y)
-            return True
-        return False

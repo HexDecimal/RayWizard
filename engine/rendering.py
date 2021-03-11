@@ -119,6 +119,7 @@ def render_main(console: tcod.console.Console) -> None:
     status_console = tcod.Console(STATUS_WIDTH, UI_SIZE[1] - 1)
     status_console.print(0, 0, f"Status - {g.world.player.x},{g.world.player.y}")
     status_console.print(0, 1, f"HP {g.world.player.hp}")
+    status_console.print(0, status_console.height - 1, f"Dungeon level {g.world.map.level}")
     status_console.blit(console, console.width - UI_SIZE[0] - STATUS_WIDTH, console.height - UI_SIZE[1] + 1)
 
 

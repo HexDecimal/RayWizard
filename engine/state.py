@@ -101,17 +101,35 @@ class State(tcod.event.EventDispatch[None]):
     def cmd_cast(self, index: int) -> None:
         """Cast a spell from the hotbar."""
 
+    def cmd_down(self) -> None:
+        """Go down stairs."""
+
+    def cmd_up(self) -> None:
+        """Go up stairs."""
+
     def debug_regenerate_map(self) -> None:
         """Regenerate the current map."""
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         """Dispatch keys to various commands.  This creates a consistant interface across states."""
+        shift = bool(event.mod & tcod.event.KMOD_SHIFT)
         if event.sym == tcod.event.K_ESCAPE:
             self.cmd_cancel()
-        elif event.sym in MOVE_KEYS:
+        elif event.sym in MOVE_KEYS and not shift:
             self.cmd_move(*MOVE_KEYS[event.sym])
-        elif event.sym in HOTBAR_KEYS:
+        elif event.sym in HOTBAR_KEYS and not shift:
             self.cmd_cast(HOTBAR_KEYS[event.sym])
+        elif event.sym == tcod.event.K_PERIOD and shift:
+            self.cmd_down()
+        elif event.sym == tcod.event.K_COMMA and shift:
+            self.cmd_up()
+        elif event.scancode == tcod.event.SCANCODE_NONUSBACKSLASH:
+            # Handle non-US keyboards.
+            if event.mod & tcod.event.KMOD_SHIFT:
+                self.cmd_down()
+            else:
+                self.cmd_up()
+
         elif __debug__ and event.sym == tcod.event.K_F2:
             self.debug_regenerate_map()
         elif __debug__ and event.sym == tcod.event.K_F3:

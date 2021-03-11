@@ -17,10 +17,9 @@ logger = logging.getLogger(__name__)
 class World:
     """This class is used to hold everything you'll want to save between sessions."""
 
-    player: engine.actor.Actor  # The active player actor, this might be removed from here.
+    map: engine.map.Map
 
     def __init__(self) -> None:
-        self.map = engine.map.Map(128, 128)
         self.rng = random.Random()
         self.spell_slots: List[Optional[engine.spells.Spell]] = [
             engine.spells.PlaceActor(name="Place bomb", cooldown=8, spawn=engine.actor.Bomb),
@@ -36,6 +35,7 @@ class World:
         ]  # Spells equipped to the hotbar.
         assert len(self.spell_slots) == 10
         self.log: List[str] = []  # Text log.
+        self.player = engine.actor.Player(0, 0)
 
     def report(self, message: str) -> None:
         """Append to the text log."""

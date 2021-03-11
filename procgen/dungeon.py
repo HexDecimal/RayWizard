@@ -89,14 +89,14 @@ def create_noise_map(width: int, height: int, wall_percent: int) -> np.ndarray:
     return np.random.random((height, width)).transpose() < wall_percent / 100  # type: ignore
 
 
-def generate(model: engine.world.World, width: int = 80, height: int = 45) -> engine.map.Map:
+def generate(model: engine.world.World, level: int, width: int = 80, height: int = 45) -> engine.map.Map:
     """Return a randomly generated GameMap."""
     room_max_size = 20
     room_min_size = 4
     max_rooms = 100
     # close_room = False
 
-    gm = engine.map.Map(width, height)
+    gm = engine.map.Map(width, height, level=level)
     gm.tiles[...] = engine.tiles.WALL
     engine.rendering.debug_map(gm)
     rooms: List[Room] = []
@@ -160,7 +160,9 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
         engine.rendering.debug_map(gm)
 
     # Add player to the first room.
-    model.player = engine.actor.Player(*rooms[0].center)
+    if hasattr(model, "map") and model.player in model.map.actors:
+        model.map.remove_actor(model.player)  # Remove player from the previous map.
+    model.player.x, model.player.y = rooms[0].center
     gm.add_actor(model.player)
     engine.rendering.debug_map(gm)
 

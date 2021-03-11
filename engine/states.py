@@ -42,8 +42,18 @@ class InGame(State):
             spell.cooldown_left = spell.cooldown_length + 1
             g.states.pop()
 
+    def cmd_down(self) -> None:
+        for obj in g.world.map.features:
+            if not (obj.x == g.world.player.x and obj.y == g.world.player.y):
+                continue
+            if not isinstance(obj, engine.features.StairsDown):
+                continue
+            g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
+            g.states.pop()
+            break
+
     def debug_regenerate_map(self) -> None:
-        g.world.map = procgen.dungeon.generate(g.world)
+        g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level)
         g.states.pop()  # Reset the players turn.
 
 

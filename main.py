@@ -23,7 +23,7 @@ def main() -> None:
     with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset) as g.context:
         g.world = engine.world.World()
 
-        g.world.map = procgen.dungeon.generate(g.world)
+        g.world.map = procgen.dungeon.generate(g.world, level=1)
 
         g.world.loop()
 

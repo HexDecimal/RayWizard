@@ -59,9 +59,10 @@ class Camera(NamedTuple):
 class Map:
     """Maps hold a descrete set of data which can be switched between more easily."""
 
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, level: int) -> None:
         self.width = width
         self.height = height
+        self.level = level
         self.tiles = np.empty((width, height), TILE_DT, order="F")
         self.tiles[:] = engine.tiles.DEFAULT
         self.memory: np.ndarray = np.full((width, height), engine.rendering.SHROUD, order="F")

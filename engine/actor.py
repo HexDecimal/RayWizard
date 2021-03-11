@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Tuple, Type
+from typing import Any, Callable, Optional, Tuple
 
 import numpy as np
 import tcod
@@ -21,11 +21,16 @@ class Actor(Schedulable):
 
     ch = "X"
     fg = (0xFF, 0xFF, 0xFF)
-    default_ai: Type[engine.actions.Action] = engine.actions.DefaultAI
+    default_ai: Callable[..., engine.actions.Action] = engine.actions.DefaultAI
     faction = "hostile"
 
     def __init__(
-        self, x: int, y: int, *, ai: Optional[Type[engine.actions.Action]] = None, faction: Optional[str] = None
+        self,
+        x: int,
+        y: int,
+        *,
+        ai: Optional[Callable[[Actor], engine.actions.Action]] = None,
+        faction: Optional[str] = None,
     ):
         self.x = x
         self.y = y
@@ -76,7 +81,7 @@ class Bomb(Actor):
     """Counts down to zero and then deletes nearby actors."""
 
     faction = "player"
-    default_ai: Type[engine.actions.Action] = engine.actions.IdleAction
+    default_ai: Callable[[Actor], engine.actions.Action] = engine.actions.IdleAction
 
     def __init__(self, x: int, y: int):
         super().__init__(x, y)
@@ -105,7 +110,7 @@ class Bomb(Actor):
 
 
 class Totem(Actor):
-    default_ai: Type[engine.actions.Action] = engine.actions.IdleAction
+    default_ai: Callable[..., engine.actions.Action] = engine.actions.IdleAction
     faction = "player"
 
     def __init__(self, x: int, y: int):
@@ -121,12 +126,12 @@ class Totem(Actor):
 
 class FlyingBomb(Bomb):
     faction = "player"
-    default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy
+    default_ai: Callable[..., engine.actions.Action] = engine.actions.SeekEnemy
 
 
 class HunterEnemy(Actor):
     faction = "hostile"
-    default_ai: Type[engine.actions.Action] = engine.actions.SeekEnemy
+    default_ai: Callable[..., engine.actions.Action] = engine.actions.SeekEnemy
     attack_effect = engine.effects.PlaceAcid(power=2)  # does two damage
 
     def bump(self, other: Actor) -> bool:
@@ -137,3 +142,17 @@ class HunterEnemy(Actor):
 
     def on_turn(self) -> None:
         super().on_turn()
+
+
+class HeatBoltEnemy(Actor):
+    faction = "hostile"
+    default_ai: Any = staticmethod(
+        lambda actor: engine.actions.RangedIdle(actor, effect=engine.effects.Heat(power=2), range=2)
+    )
+
+
+class ColdBoltEnemy(Actor):
+    faction = "hostile"
+    default_ai: Any = staticmethod(
+        lambda actor: engine.actions.RangedIdle(actor, effect=engine.effects.Cold(power=1), range=2)
+    )

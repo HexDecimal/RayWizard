@@ -23,6 +23,20 @@ class Action:
         super().__init__()
         self.actor = actor  # The actor performing this action.
 
+    def distance_to(self, other: engine.actor.Actor) -> int:
+        """Return the squared distance to another actor."""
+        return (self.actor.x - other.x) ** 2 + (self.actor.y - other.y) ** 2
+
+    def get_targets(self) -> Iterator[engine.actor.Actor]:
+        """Ither over the enemies in my actors FOV."""
+        my_fov = self.actor.get_fov()
+        for other in g.world.map.actors:
+            if other.faction == self.actor.faction:
+                continue
+            if not my_fov[other.xy]:
+                continue
+            yield other
+
     def perform(self) -> bool:
         """Perform the action and return its status.
 
@@ -66,6 +80,12 @@ class ActionWithDir(Action):
             if not g.world.map.in_bounds(x, y):
                 break
             yield x, y
+
+
+class WithTarget(Action):
+    def __init__(self, actor: engine.actor.Actor, target_xy: Tuple[int, int], **kargs: Any):
+        self.target_xy = target_xy
+        super().__init__(actor=actor, **kargs)  # type: ignore
 
 
 class ActionWithEffect(Action):
@@ -126,10 +146,12 @@ class WithRange(Action):
         self.range = range
         super().__init__(actor=actor, **kargs)  # type: ignore
 
-    def trace_range(self, with_center: bool) -> Iterator[Tuple[int, int]]:
-        for y in range(self.actor.y - self.range, self.actor.y + self.range + 1):
-            for x in range(self.actor.x - self.range, self.actor.x + self.range + 1):
-                if not with_center and x == self.actor.x and y == self.actor.y:
+    def trace_range(self, with_center: bool, center: Optional[Tuple[int, int]] = None) -> Iterator[Tuple[int, int]]:
+        if center is None:
+            center = (self.actor.x, self.actor.y)
+        for y in range(center[1] - self.range, center[1] + self.range + 1):
+            for x in range(center[0] - self.range, center[0] + self.range + 1):
+                if not with_center and x == center[0] and y == center[1]:
                     continue
                 if not g.world.map.in_bounds(x, y):
                     continue
@@ -213,20 +235,6 @@ class SeekEnemy(Action):
         self.pathfinder: Optional[Pathfind] = None
         super().__init__(actor)
 
-    def distance_to(self, other: engine.actor.Actor) -> int:
-        """Return the squared distance to another actor."""
-        return (self.actor.x - other.x) ** 2 + (self.actor.y - other.y) ** 2
-
-    def get_targets(self) -> Iterator[engine.actor.Actor]:
-        """Ither over the enemies in my actors FOV."""
-        my_fov = self.actor.get_fov()
-        for other in g.world.map.actors:
-            if other.faction == self.actor.faction:
-                continue
-            if not my_fov[other.xy]:
-                continue
-            yield other
-
     def perform(self) -> bool:
         targets = list(self.get_targets())
         if targets:
@@ -248,3 +256,22 @@ class PlayerControl(Action):
         g.world.map.camera = engine.map.Camera(self.actor.x, self.actor.y)
         engine.states.InGame().run_modal()
         return True
+
+
+class Ball(ActionWithEffect, WithRange, WithTarget):
+    """Apply an effect in an explostion over a point."""
+
+    def perform(self) -> bool:
+        for x, y in self.trace_range(with_center=True, center=self.target_xy):
+            self.effect.apply(x, y)
+        return True
+
+
+class RangedIdle(ActionWithEffect, WithRange):
+    def perform(self) -> bool:
+        targets = list(self.get_targets())
+        if targets:
+            nearest = min(targets, key=self.distance_to)
+            return Ball(self.actor, range=self.range, effect=self.effect, target_xy=nearest.xy).perform()
+        else:
+            return DefaultAI(self.actor).perform()

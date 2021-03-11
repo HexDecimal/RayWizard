@@ -52,7 +52,12 @@ class World:
                 map_tiles["bg"] //= 4
                 np.putmask(self.map.memory, self.player.get_fov(), map_tiles)
             if next_obj.skip_turns == 0:
-                next_obj.on_turn()
+                try:
+                    next_obj.on_turn()
+                except engine.actions.StopAction as exc:
+                    if self.player is next_obj:
+                        self.report(exc.args[0])
+                        continue  # Start over and call next_obj.on_turn again.
             else:
                 next_obj.skip_turns -= 1
             if self.map.schedule and self.map.schedule[0] is next_obj:

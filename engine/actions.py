@@ -16,6 +16,10 @@ import engine.effects  # Must be imported after engine.tiles.  # isort:skip
 logger = logging.getLogger(__name__)
 
 
+class StopAction(Exception):
+    """Cancels out of an action."""
+
+
 class Action:
     """Basic action with no targets other than the invoking actor."""
 
@@ -60,7 +64,8 @@ class ActionWithDir(Action):
             state = engine.states.AskDirection()
             state.run_modal()
             self._direction = state.direction
-            assert self._direction  # Todo, handle no direction given.
+            if self._direction is None:
+                raise StopAction("No direction given.")
         return self._direction
 
     @property

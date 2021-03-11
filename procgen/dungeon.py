@@ -94,7 +94,6 @@ def generate(model: engine.world.World, level: int, width: int = 80, height: int
     room_max_size = 20
     room_min_size = 4
     max_rooms = 100
-    # close_room = False
 
     gm = engine.map.Map(width, height, level=level)
     gm.tiles[...] = engine.tiles.WALL

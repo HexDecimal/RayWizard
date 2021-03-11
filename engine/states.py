@@ -88,6 +88,10 @@ class InGame(State):
     def cmd_help(self) -> None:
         Help().run_modal()
 
+    def cmd_explore(self) -> None:
+        engine.actions.Explore(g.world.player).perform()
+        g.states.pop()  # Reset the players turn.
+
     def debug_regenerate_map(self) -> None:
         g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level)
         g.states.pop()  # Reset the players turn.

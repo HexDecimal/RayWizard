@@ -66,6 +66,7 @@ class Map:
         self.tiles = np.empty((width, height), TILE_DT, order="F")
         self.tiles[:] = engine.tiles.DEFAULT
         self.memory: np.ndarray = np.full((width, height), engine.rendering.SHROUD, order="F")
+        self.explored: np.ndarray = np.zeros((width, height), dtype=bool, order="F")
         self.actors: Set[engine.actor.Actor] = set()
         self.features: Set[engine.features.Feature] = set()
         self.schedule: Deque[engine.sched.Schedulable] = collections.deque()
@@ -107,3 +108,4 @@ class Map:
         map_tiles["fg"] //= 4
         map_tiles["bg"] //= 4
         np.putmask(self.memory, touched, map_tiles)
+        self.explored |= touched

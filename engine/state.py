@@ -110,6 +110,9 @@ class State(tcod.event.EventDispatch[None]):
     def cmd_help(self) -> None:
         """Help key was pressed."""
 
+    def cmd_explore(self) -> None:
+        """Auto-explore"""
+
     def debug_regenerate_map(self) -> None:
         """Regenerate the current map."""
 
@@ -134,6 +137,8 @@ class State(tcod.event.EventDispatch[None]):
                 self.cmd_down()
             else:
                 self.cmd_up()
+        elif event.sym == tcod.event.K_x and not shift:
+            self.cmd_explore()
 
         elif __debug__ and event.sym == tcod.event.K_F2:
             self.debug_regenerate_map()

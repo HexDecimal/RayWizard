@@ -281,3 +281,22 @@ class RangedIdle(ActionWithEffect, WithRange):
             return Ball(self.actor, range=self.range, effect=self.effect, target_xy=nearest.xy).perform()
         else:
             return DefaultAI(self.actor).perform()
+
+
+class Explore(Action):
+    """Move towards unexplored areas."""
+
+    def perform(self) -> bool:
+        cost = self.actor.get_move_cost()
+        cost[g.world.map.tiles["dangerous"]] = 0  # Avoid acid tiles.
+        distance = tcod.path.maxarray(cost.shape, order="F")
+        unexpored = ~g.world.map.explored
+        distance[unexpored] = 0
+        cost[unexpored] = 1
+        tcod.path.dijkstra2d(distance, cost, cardinal=2, diagonal=3)
+        path = tcod.path.hillclimb2d(distance, self.actor.xy, cardinal=True, diagonal=True)[1:]
+        if not len(path):
+            raise StopAction("No more areas to explore.")
+        x, y = path[0].tolist()
+        x, y = x - self.actor.x, y - self.actor.y
+        return MoveAction(self.actor, direction=(x, y)).perform()

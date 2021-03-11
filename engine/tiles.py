@@ -15,6 +15,7 @@ TILE_DT = np.dtype(
         ("transparent", bool),
         ("graphic", tile_graphic),
         ("effect", object),
+        ("dangerous", bool),
     ]
 )
 
@@ -26,6 +27,7 @@ class Tile(NamedTuple):
     transparent: bool
     graphic: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
     effect: Optional[engine.effects.Effect] = None
+    dangerous: bool = False
 
     def as_np(self) -> np.ndarray:
         """Return this tile as an array scaler."""
@@ -72,4 +74,5 @@ ACID = Tile(
     transparent=True,
     graphic=(ord("°"), (0xFF, 0xFF, 0xFF), (86, 208, 86)),
     effect=Effect(power=1),
+    dangerous=True,
 )

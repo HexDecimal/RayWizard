@@ -88,6 +88,10 @@ class Actor(Schedulable):
             )
         return visible
 
+    def get_move_cost(self) -> np.ndarray:
+        """Get the real move cost of an actor."""
+        return g.world.map.tiles["move_cost"].copy()  # type: ignore
+
     def bump(self, other: Actor) -> bool:
         """Called when one actor bumps into another.
 

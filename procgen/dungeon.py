@@ -9,6 +9,7 @@ import scipy.signal  # type: ignore
 import tcod
 
 import engine.actions
+import engine.features
 import engine.map
 import engine.rendering
 import engine.tiles
@@ -150,7 +151,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     engine.rendering.debug_map(gm)
 
     # Add actors to rooms.
-    for room in rooms[1:]:
+    for room in rooms[1:-1]:
         if random.randint(0, 1):
             # gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
             gm.add_actor(engine.actor.ColdBoltEnemy(*room.center))
@@ -161,6 +162,10 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     # Add player to the first room.
     model.player = engine.actor.Player(*rooms[0].center)
     gm.add_actor(model.player)
+    engine.rendering.debug_map(gm)
+
+    gm.add_feature(engine.features.StairsDown(*rooms[-1].center))
+    gm.tiles[rooms[-1].center] = engine.tiles.FLOOR
     engine.rendering.debug_map(gm)
 
     return gm

@@ -7,6 +7,7 @@ from typing import Deque, NamedTuple, Set, Tuple, Union
 import numpy as np
 
 import engine.actor
+import engine.features
 import engine.sched
 import engine.tiles
 from engine.tiles import TILE_DT
@@ -65,6 +66,7 @@ class Map:
         self.tiles[:] = engine.tiles.DEFAULT
         self.memory: np.ndarray = np.full((width, height), engine.rendering.SHROUD, order="F")
         self.actors: Set[engine.actor.Actor] = set()
+        self.features: Set[engine.features.Feature] = set()
         self.schedule: Deque[engine.sched.Schedulable] = collections.deque()
         self.camera: Camera = Camera(0, 0)
 
@@ -76,6 +78,12 @@ class Map:
     def remove_actor(self, actor: engine.actor.Actor) -> None:
         self.actors.remove(actor)
         self.schedule.remove(actor)
+
+    def add_feature(self, feature: engine.features.Feature) -> None:
+        self.features.add(feature)
+
+    def remove_feature(self, feature: engine.features.Feature) -> None:
+        self.features.remove(feature)
 
     def in_bounds(self, x: int, y: int) -> bool:
         """Returns True if `x`,`y` is in bounds of this map."""

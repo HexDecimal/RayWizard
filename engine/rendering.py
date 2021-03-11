@@ -32,8 +32,14 @@ def render_map(map_: engine.map.Map, world_view: Optional[Tuple[slice, slice]], 
         world_view = slice(0, map_.width), slice(0, map_.height)
     output: np.ndarray = map_.tiles["graphic"][world_view].copy()
 
-    # Render all actors.
     cam_x, cam_y = world_view[0].start, world_view[1].start
+    # Render features.
+    for feature in map_.features:
+        x = feature.x - cam_x
+        y = feature.y - cam_y
+        if 0 <= x < output.shape[0] and 0 <= y < output.shape[1]:
+            output[["ch", "fg"]][x, y] = feature.ch, feature.fg
+    # Render all actors.
     for actor in map_.actors:
         x = actor.x - cam_x
         y = actor.y - cam_y

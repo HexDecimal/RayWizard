@@ -137,3 +137,31 @@ class HunterEnemy(Actor):
 
     def on_turn(self) -> None:
         super().on_turn()
+
+class HeatBoltEnemy(Actor):
+    faction = "hostile"
+    attack_effect = engine.effects.Heat(power=2) #does two damage
+
+    #In retrospect this would be simpler with a single base class
+    # and subclasses which just change the engine.effects.*
+    def heatBolt(self, other: Actor) -> bool:#don't know if this will work?
+        if other.faction != self.faction:
+            self.attack_effect.apply(*other.xy)
+            for y in range(other.y - 2, other.y + 2):
+                for x in range(other.x - 2, other.x + 2):
+                    self.attack_effect.apply(x,y)
+            return True
+        return False
+
+class ColdBoltEnemy(Actor):
+    faction = "hostile"
+    attack_effect = engine.effects.Cold(power=1) #does one damage
+
+    def heatBolt(self, other: Actor) -> bool:#don't know if this will work?
+        if other.faction != self.faction:
+            self.attack_effect.apply(*other.xy)
+            for y in range(other.y - 2, other.y + 2):
+                for x in range(other.x - 2, other.x + 2):
+                    self.attack_effect.apply(x,y)
+            return True
+        return False

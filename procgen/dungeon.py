@@ -57,7 +57,7 @@ class Room:
         for _ in range(number):
             x = random.randint(self.x1 + 1, self.x2 - 2)
             y = random.randint(self.y1 + 1, self.y2 - 2)
-            if gamemap.is_blocked(x, y):
+            if gamemap.is_blocked(x, y, None):
                 continue
             yield x, y
 

@@ -24,6 +24,9 @@ class Actor(Schedulable):
     hp: int = 10
     faction = "hostile"
     share_vision: bool = False  # If True this object shares vision with its own faction.
+    can_walk = True
+    can_fly = False
+    can_swim = False
 
     def __init__(
         self,
@@ -99,7 +102,18 @@ class Actor(Schedulable):
 
     def get_move_cost(self) -> np.ndarray:
         """Get the real move cost of an actor."""
-        return g.world.map.tiles["move_cost"].copy()  # type: ignore
+        if self.can_walk is True and self.can_swim is False and self.can_fly is False:
+            return g.world.map.tiles["move_cost"].copy()  # type: ignore
+
+        # This fallback will have to do for now.
+        cost: np.ndarray = np.zeros_like(g.world.map.tiles, dtype=np.uint8)
+        if self.can_swim:
+            np.putmask(cost, g.world.map.tiles["swim_cost"] != 0, g.world.map.tiles["swim_cost"])
+        if self.can_walk:
+            np.putmask(cost, g.world.map.tiles["move_cost"] != 0, g.world.map.tiles["move_cost"])
+        if self.can_fly:
+            np.putmask(cost, g.world.map.tiles["fly_cost"] != 0, g.world.map.tiles["fly_cost"])
+        return cost
 
     def bump(self, other: Actor) -> bool:
         """Called when one actor bumps into another.
@@ -123,6 +137,7 @@ class Scout(Actor):
     faction = "player"
     share_vision = True
     hp = 1
+    can_fly = True
 
     def default_ai(self) -> engine.actions.Action:
         return engine.actions.Explore(self)

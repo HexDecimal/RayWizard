@@ -111,7 +111,7 @@ class MoveAction(ActionWithDir):
         if self.direction == (0, 0):
             return IdleAction(self.actor).perform()
         xy = self.target_xy
-        blocker = g.world.map.is_blocked(*xy)
+        blocker = g.world.map.is_blocked(*xy, self.actor)
         if isinstance(blocker, engine.actor.Actor):
             return self.actor.bump(blocker)
         if blocker:
@@ -130,7 +130,7 @@ class PlaceActor(ActionWithDir):
 
     def perform(self) -> bool:
         xy = self.target_xy
-        if not g.world.map.is_blocked(*xy):
+        if not g.world.map.is_blocked(*xy, None):
             g.world.map.add_actor(self.spawn(*xy))
             return True
         return False

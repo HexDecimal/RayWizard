@@ -152,7 +152,7 @@ def generate(model: engine.world.World, width: int = 80, height: int = 45) -> en
     # Add actors to rooms.
     for room in rooms[1:]:
         if random.randint(0, 1):
-            #gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
+            # gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
             gm.add_actor(engine.actor.ColdBoltEnemy(*room.center))
         else:
             gm.add_actor(engine.actor.HunterEnemy(*room.center))

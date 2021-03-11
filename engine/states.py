@@ -81,6 +81,7 @@ class InGame(State):
                 continue
             if not isinstance(obj, engine.features.StairsDown):
                 continue
+            g.world.player.hp = 12
             g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
             g.states.pop()
             break

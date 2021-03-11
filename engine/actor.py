@@ -112,6 +112,7 @@ class Actor(Schedulable):
 class Player(Actor):
     ch = "@"
     faction = "player"
+    hp = 12
 
     def default_ai(self) -> engine.actions.Action:
         return engine.actions.PlayerControl(self)

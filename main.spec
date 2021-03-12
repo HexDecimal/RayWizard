@@ -5,7 +5,7 @@ block_cipher = None
 
 a = Analysis(
     ["main.py"],
-    pathex=["C:\\Users\\4b796\\Projects\\7drl-2021"],
+    pathex=["."],
     binaries=[],
     datas=[("Alloy_curses_12x12.png", ".")],
     hiddenimports=[],
@@ -28,6 +28,6 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
 )
 coll = COLLECT(exe, a.binaries, a.zipfiles, a.datas, strip=False, upx=True, upx_exclude=[], name="main")

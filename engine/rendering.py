@@ -125,6 +125,8 @@ def render_log(log_console: tcod.console.Console) -> None:
     y = log_console.height
     for message in reversed(g.world.log):
         y -= tcod.console.get_height_rect(log_console.width, message)
+        if y < 0:
+            break
         log_console.print_box(0, y, 0, 0, message, fg=TEXT_COLOR, bg=BG)
 
 

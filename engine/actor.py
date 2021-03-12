@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 class Actor(Schedulable):
     """Objects which are able to move on their own."""
 
+    name = "<actor>"
     ch = "X"
     fg = (0xFF, 0xFF, 0xFF)
     hp: int = 10
@@ -70,10 +71,10 @@ class Actor(Schedulable):
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
         damage = effect.power  # Placeholder.
-        g.world.report(f"{self} takes {damage} damage.")
+        g.world.report(f"{self.name.title()} takes {damage} damage.")
         self.hp -= damage
         if self.hp <= 0:
-            g.world.report(f"{self} dies.")
+            g.world.report(f"{self.name.title()} dies.")
             g.world.map.remove_actor(self)
 
     @property
@@ -131,6 +132,7 @@ class Actor(Schedulable):
 
 
 class Player(Actor):
+    name = "player"
     ch = "@"
     faction = "player"
     hp = 12
@@ -140,6 +142,7 @@ class Player(Actor):
 
 
 class Scout(Actor):
+    name = "scout"
     ch = "s"
     faction = "player"
     share_vision = True
@@ -153,6 +156,7 @@ class Scout(Actor):
 class Bomb(Actor):
     """Counts down to zero and then deletes nearby actors."""
 
+    name = "bomb"
     faction = "player"
 
     def __init__(self, x: int, y: int):
@@ -180,6 +184,7 @@ class Bomb(Actor):
 
 
 class Totem(Actor):
+    name = "totem"
     faction = "player"
 
     def __init__(self, x: int, y: int):
@@ -194,6 +199,7 @@ class Totem(Actor):
 
 
 class FlyingBomb(Bomb):
+    name = "flying bomb"
     faction = "player"
 
     def default_ai(self) -> engine.actions.Action:
@@ -201,6 +207,7 @@ class FlyingBomb(Bomb):
 
 
 class HunterEnemy(Actor):
+    name = "hunter"
     faction = "hostile"
     attack_effect = engine.effects.PlaceAcid(power=2)  # does two damage
 
@@ -215,6 +222,7 @@ class HunterEnemy(Actor):
 
 
 class HeatBoltEnemy(Actor):
+    name = "fire caster"
     faction = "hostile"
     ch = "H"
 
@@ -223,6 +231,7 @@ class HeatBoltEnemy(Actor):
 
 
 class ColdBoltEnemy(Actor):
+    name = "ice caster"
     faction = "hostile"
     ch = "C"
 

@@ -91,8 +91,8 @@ class InGame(State):
         Help().run_modal()
 
     def cmd_explore(self) -> None:
-        engine.actions.Explore(g.world.player).perform()
-        g.states.pop()  # Reset the players turn.
+        g.world.player.ai = engine.actions.AutoExplore(g.world.player)
+        g.states.pop()
 
     def debug_regenerate_map(self) -> None:
         g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level)

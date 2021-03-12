@@ -49,6 +49,8 @@ class World:
                 try:
                     next_obj.on_turn()
                 except engine.actions.StopAction as exc:
+                    if isinstance(next_obj, engine.actor.Actor):
+                        next_obj.ai = None
                     if self.player is next_obj:
                         self.report(exc.args[0])
                         continue  # Start over and call next_obj.on_turn again.

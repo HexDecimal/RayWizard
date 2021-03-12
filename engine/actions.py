@@ -303,3 +303,15 @@ class Explore(Action):
         x, y = path[0].tolist()
         x, y = x - self.actor.x, y - self.actor.y
         return MoveAction(self.actor, direction=(x, y)).perform()
+
+
+class AutoExplore(Action):
+    def perform(self) -> bool:
+        fov = self.actor.get_fov(plus_shared=False)
+        for other in g.world.map.actors:
+            if other.faction == self.actor.faction:
+                continue
+            if not fov[other.xy]:
+                continue
+            raise StopAction(f"You see a {other.name} nearby!")
+        return Explore(self.actor).perform()

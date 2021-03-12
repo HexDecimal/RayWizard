@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import random
-from typing import Iterator, List, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 import numpy as np
 import scipy.signal  # type: ignore
@@ -89,8 +89,20 @@ def create_noise_map(width: int, height: int, wall_percent: int) -> np.ndarray:
     return np.random.random((height, width)).transpose() < wall_percent / 100  # type: ignore
 
 
-def generate(model: engine.world.World, level: int, width: int = 80, height: int = 45, wallType: Tile = engine.tiles.WALL, waterType: Tile = engine.tiles.WATER, room_max_size: int = 20) -> engine.map.Map:
+def generate(
+    model: engine.world.World,
+    level: int,
+    width: int = 80,
+    height: int = 45,
+    wallType: Optional[engine.tiles.Tile] = None,
+    waterType: Optional[engine.tiles.Tile] = None,
+    room_max_size: int = 20,
+) -> engine.map.Map:
     """Return a randomly generated GameMap."""
+    if wallType is None:
+        wallType = engine.tiles.WALL
+    if waterType is None:
+        waterType = engine.tiles.WATER
     room_min_size = 4
     max_rooms = 100
 

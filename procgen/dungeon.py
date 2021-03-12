@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import random
-from typing import Iterator, List, Optional, Tuple
+from typing import Iterator, List, Tuple
 
 import numpy as np
 import scipy.signal  # type: ignore
@@ -94,15 +94,15 @@ def generate(
     level: int,
     width: int = 80,
     height: int = 45,
-    wallType: Optional[engine.tiles.Tile] = None,
-    waterType: Optional[engine.tiles.Tile] = None,
     room_max_size: int = 20,
 ) -> engine.map.Map:
     """Return a randomly generated GameMap."""
-    if wallType is None:
-        wallType = engine.tiles.WALL
-    if waterType is None:
-        waterType = engine.tiles.WATER
+    wallType = engine.tiles.WALL
+    waterType = engine.tiles.WATER
+
+    if level == 3:
+        waterType = engine.tiles.ACID
+
     room_min_size = 4
     max_rooms = 100
 

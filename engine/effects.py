@@ -19,6 +19,8 @@ class Cold(Effect):
         super().apply(x, y)
         if g.world.map.tiles[x, y] == engine.tiles.WATER.as_np():
             g.world.map.tiles[x, y] = engine.tiles.ICE_FLOOR
+        if g.world.map.tiles[x, y] == engine.tiles.ACID.as_np():
+            g.world.map.tiles[x, y] = engine.tiles.ICE_FLOOR
 
 
 class Heat(Effect):

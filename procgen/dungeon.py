@@ -89,14 +89,13 @@ def create_noise_map(width: int, height: int, wall_percent: int) -> np.ndarray:
     return np.random.random((height, width)).transpose() < wall_percent / 100  # type: ignore
 
 
-def generate(model: engine.world.World, level: int, width: int = 80, height: int = 45) -> engine.map.Map:
+def generate(model: engine.world.World, level: int, width: int = 80, height: int = 45, wallType: Tile = engine.tiles.WALL, waterType: Tile = engine.tiles.WATER, room_max_size: int = 20) -> engine.map.Map:
     """Return a randomly generated GameMap."""
-    room_max_size = 20
     room_min_size = 4
     max_rooms = 100
 
     gm = engine.map.Map(width, height, level=level)
-    gm.tiles[...] = engine.tiles.WALL
+    gm.tiles[...] = wallType
     engine.rendering.debug_map(gm)
     rooms: List[Room] = []
 
@@ -146,7 +145,7 @@ def generate(model: engine.world.World, level: int, width: int = 80, height: int
     automataMap1 = convolve(randomMap, 10)  # second value is the number of nearby tiles needed to be water.
 
     # step 3: Use map to replace wall and floor tiles with water.
-    gm.tiles[~automataMap1] = engine.tiles.WATER
+    gm.tiles[~automataMap1] = waterType
     engine.rendering.debug_map(gm)
 
     # Add actors to rooms.

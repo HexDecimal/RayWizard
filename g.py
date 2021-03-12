@@ -17,3 +17,4 @@ world: engine.world.World  # The active world.
 
 debug_dungeon_generation: bool = __debug__  # Visualize the dungeon being generated.
 debug_fullbright: bool = False
+debug_rendering: bool = False  # Highlight areas which have not been drawn over.

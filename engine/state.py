@@ -69,7 +69,7 @@ class State(tcod.event.EventDispatch[None]):
         while self in g.states:
             # Rendering.
             console = g.context.new_console(CONSOLE_WIDTH, CONSOLE_HEIGHT, order="F")
-            if __debug__:
+            if g.debug_rendering:
                 console.clear(bg=(0xFF, 0x00, 0xFF))  # Unhandled areas are now magic pink.
             g.states[-1].on_draw(console)
             g.context.present(console, integer_scaling=True)

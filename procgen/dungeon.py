@@ -155,7 +155,7 @@ def generate(
 
     # Start of Water generation:
     # step 1 make random map noise:
-    if level != 2:
+    if level != 3:
         randomMap = create_noise_map(width, height, 80)
     else:
         randomMap = create_noise_map(width, height, 70)
@@ -171,10 +171,13 @@ def generate(
     for room in rooms[1:-1]:
         if random.randint(0, 1):
             # gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
-            if level != 3:
-                gm.add_actor(engine.actor.ColdBoltEnemy(*room.center))
+            if level == 1: #Acid level
+                if random.randint(0, 1):
+                    gm.add_actor(engine.actor.AcidBoltEnemy(*room.center))
+                else:
+                    gm.add_actor(engine.actor.HeatBoltEnemy(*room.center))
             else:
-                gm.add_actor(engine.actor.AcidBoltEnemy(*room.center))
+                gm.add_actor(engine.actor.ColdBoltEnemy(*room.center))
         else:
             gm.add_actor(engine.actor.HunterEnemy(*room.center))
         engine.rendering.debug_map(gm)

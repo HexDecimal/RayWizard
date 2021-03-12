@@ -143,6 +143,8 @@ class Beam(ActionWithDir, ActionWithEffect):
         for xy in self.trace_line():
             if not g.world.map.tiles[xy]["transparent"]:
                 break  # Hit wall.
+            if g.world.player.get_fov()[xy]:
+                engine.animation.Animation(layers=[engine.rendering.Sprite(*xy, ord("*"), (255, 255, 255))]).show()
             self.effect.apply(*xy)
         return True
 
@@ -167,8 +169,13 @@ class WithRange(Action):
 class Blast(ActionWithEffect, WithRange):
     def perform(self) -> bool:
         """Trace the area around the actor and apply the effect."""
+        layers = []
         for xy in self.trace_range(with_center=False):
+            if g.world.player.get_fov()[xy]:
+                layers.append(engine.rendering.Sprite(*xy, ord("*"), (255, 255, 255)))
             self.effect.apply(*xy)
+        if layers:
+            engine.animation.Animation(layers, sleep_time=1 / 5).show()
         return True
 
 
@@ -268,8 +275,13 @@ class Ball(ActionWithEffect, WithRange, WithTarget):
     """Apply an effect in an explostion over a point."""
 
     def perform(self) -> bool:
+        layers = []
         for x, y in self.trace_range(with_center=True, center=self.target_xy):
+            if g.world.player.get_fov()[x, y]:
+                layers.append(engine.rendering.Sprite(x, y, ord("*"), (255, 255, 255)))
             self.effect.apply(x, y)
+        if layers:
+            engine.animation.Animation(layers=layers, sleep_time=1 / 5).show()
         return True
 
 
@@ -318,4 +330,6 @@ class AutoExplore(Action):
             if not fov[other.xy]:
                 continue
             raise StopAction(f"You see a {other.name} nearby!")
+        if engine.animation.events_in_queue():
+            raise StopAction("Auto-explore interrupted.")
         return Explore(self.actor).perform()

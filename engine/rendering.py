@@ -36,6 +36,25 @@ class Highlight(Layer):
         np.invert(output["fg"], out=output["fg"], where=self.highlight[world_view][..., np.newaxis])
 
 
+class Sprite(Layer):
+    """Apply a single sprite to the world."""
+
+    def __init__(self, x: int, y: int, ch: int, fg: Tuple[int, int, int]):
+        self.x = x
+        self.y = y
+        self.ch = ch
+        self.fg = fg
+
+    def render(self, output: np.ndarray, world_view: Tuple[slice, slice]) -> None:
+        if not (
+            world_view[0].start <= self.x < world_view[0].stop and world_view[1].start <= self.y < world_view[1].stop
+        ):
+            return
+        x = self.x - world_view[0].start
+        y = self.y - world_view[1].start
+        output[["ch", "fg"]][x, y] = self.ch, self.fg
+
+
 def render_map(
     map_: engine.map.Map,
     world_view: Optional[Tuple[slice, slice]],

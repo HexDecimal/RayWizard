@@ -10,6 +10,9 @@
             "request": "launch",
             "module": "main",
             "console": "internalConsole",
+            "env": {
+                "LEVEL": "1"
+            }
         }
     ]
 }

@@ -147,7 +147,7 @@ def generate(
             tunnel_indices = np.r_[
                 tcod.los.bresenham(t_start, t_middle), tcod.los.bresenham(t_middle, t_end)  # Concatenate lines.
             ].transpose()  # tunnel_indices[axis, index]
-            if level != 2: #makes Ice level have 1 wide walls.
+            if level != 2:  # makes Ice level have 1 wide walls.
                 tunnel_indices = np.append(tunnel_indices, tunnel_indices - 1, axis=1)  # Make tunnels 2 wide.
             gm.tiles[tuple(tunnel_indices)] = engine.tiles.FLOOR
             engine.rendering.debug_map(gm)
@@ -171,7 +171,7 @@ def generate(
     for room in rooms[1:-1]:
         if random.randint(0, 1):
             # gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
-            if level == 1: #Acid level
+            if level == 1:  # Acid level
                 if random.randint(0, 1):
                     gm.add_actor(engine.actor.AcidBoltEnemy(*room.center))
                 else:

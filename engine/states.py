@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Optional, Tuple
 
+import numpy as np
 import tcod
 
 import engine.actions
@@ -101,8 +102,16 @@ class InGame(State):
 class AskDirection(State):
     direction: Optional[Tuple[int, int]] = None
 
+    def __init__(self, can_target_self: bool = True):
+        super().__init__()
+        self.can_target_self = can_target_self
+
     def on_draw(self, console: tcod.console.Console) -> None:
-        engine.rendering.render_main(console)
+        highlight = np.zeros_like(g.world.map.tiles, dtype=bool)
+        highlight[g.world.player.x - 1 :, g.world.player.y - 1 :][:3, :3] = True
+        if not self.can_target_self:
+            highlight[g.world.player.x, g.world.player.y] = False
+        engine.rendering.render_main(console, visible_callbacks=[engine.rendering.Highlight(highlight)])
         engine.rendering.print_extra_text(console, "Pick a direction...")
 
     def cmd_move(self, x: int, y: int) -> None:

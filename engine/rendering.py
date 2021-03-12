@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import Optional, Tuple
+from typing import Iterable, Optional, Tuple
 
 import numpy as np
 import tcod
@@ -17,7 +17,31 @@ SHROUD = np.asarray((ord(" "), (0x40, 0x40, 0x40), (0x00, 0x00, 0x00)), dtype=ti
 "The clear graphic before drawing world tiles."
 
 
-def render_map(map_: engine.map.Map, world_view: Optional[Tuple[slice, slice]], fullbright: bool = True) -> np.ndarray:
+class Layer:
+    """Post process rendering callback."""
+
+    def render(self, output: np.ndarray, world_view: Tuple[slice, slice]) -> None:
+        raise NotImplementedError()
+
+
+class Highlight(Layer):
+    """Highlight specific tiles."""
+
+    def __init__(self, highlight: np.ndarray):
+        assert highlight.dtype == bool
+        self.highlight = highlight
+
+    def render(self, output: np.ndarray, world_view: Tuple[slice, slice]) -> None:
+        np.invert(output["bg"], out=output["bg"], where=self.highlight[world_view][..., np.newaxis])
+        np.invert(output["fg"], out=output["fg"], where=self.highlight[world_view][..., np.newaxis])
+
+
+def render_map(
+    map_: engine.map.Map,
+    world_view: Optional[Tuple[slice, slice]],
+    fullbright: bool = True,
+    visible_callbacks: Iterable[Layer] = (),
+) -> np.ndarray:
     """Return a Console.tilese_rgb compatiable array of the map.
 
     `map_` is the Map object to render.
@@ -45,6 +69,9 @@ def render_map(map_: engine.map.Map, world_view: Optional[Tuple[slice, slice]], 
         y = actor.y - cam_y
         if 0 <= x < output.shape[0] and 0 <= y < output.shape[1]:
             output[["ch", "fg"]][x, y] = ord(actor.ch), actor.fg
+
+    for callback in visible_callbacks:
+        callback.render(output, world_view)
 
     if fullbright:
         return output
@@ -101,13 +128,15 @@ def render_log(log_console: tcod.console.Console) -> None:
         log_console.print_box(0, y, 0, 0, message, fg=TEXT_COLOR, bg=BG)
 
 
-def render_main(console: tcod.console.Console) -> None:
+def render_main(console: tcod.console.Console, visible_callbacks: Iterable[Layer] = ()) -> None:
     """Rendeer the main view.  With the world tiles, any objects, and the UI."""
     # Render map view.
     console_shape = (console.width - UI_SIZE[0], console.height - UI_SIZE[1])
     screen_view, world_view = g.world.map.camera.get_views(g.world.map.tiles.shape, console_shape)
     console.tiles_rgb[: console_shape[0], : console_shape[1]] = SHROUD
-    console.tiles_rgb[screen_view] = render_map(g.world.map, world_view, fullbright=g.debug_fullbright)
+    console.tiles_rgb[screen_view] = render_map(
+        g.world.map, world_view, fullbright=g.debug_fullbright, visible_callbacks=visible_callbacks
+    )
 
     render_slots(console)
 

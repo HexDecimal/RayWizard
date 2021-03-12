@@ -7,6 +7,7 @@ from typing import Any, Iterator, List, Optional, Tuple, Type
 import tcod
 
 import engine.actor
+import engine.animation
 import engine.states
 import engine.tiles
 import g
@@ -307,6 +308,9 @@ class Explore(Action):
 
 class AutoExplore(Action):
     def perform(self) -> bool:
+        if self.actor is g.world.player:
+            g.world.map.camera = engine.map.Camera(*self.actor.xy)
+            engine.animation.Animation().show()
         fov = self.actor.get_fov(plus_shared=False)
         for other in g.world.map.actors:
             if other.faction == self.actor.faction:

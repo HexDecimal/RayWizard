@@ -102,6 +102,7 @@ def generate(
 
     if level == 2:
         wallType = engine.tiles.ICE_WALL
+        waterType = engine.tiles.ICE_FLOOR
     if level == 3:
         waterType = engine.tiles.ACID
 
@@ -146,16 +147,20 @@ def generate(
             tunnel_indices = np.r_[
                 tcod.los.bresenham(t_start, t_middle), tcod.los.bresenham(t_middle, t_end)  # Concatenate lines.
             ].transpose()  # tunnel_indices[axis, index]
-            tunnel_indices = np.append(tunnel_indices, tunnel_indices - 1, axis=1)  # Make tunnels 2 wide.
+            if level != 2: #makes Ice level have 1 wide walls.
+                tunnel_indices = np.append(tunnel_indices, tunnel_indices - 1, axis=1)  # Make tunnels 2 wide.
             gm.tiles[tuple(tunnel_indices)] = engine.tiles.FLOOR
             engine.rendering.debug_map(gm)
         rooms.append(new_room)
 
     # Start of Water generation:
     # step 1 make random map noise:
-    randomMap = create_noise_map(width, height, 80)
+    if level != 2:
+        randomMap = create_noise_map(width, height, 80)
+    else:
+        randomMap = create_noise_map(width, height, 70)
 
-    # step 2: feed to cellular automata sevewral times (number of times based on tweaking.
+    # step 2: feed to cellular automata several times (number of times based on tweaking.
     automataMap1 = convolve(randomMap, 10)  # second value is the number of nearby tiles needed to be water.
 
     # step 3: Use map to replace wall and floor tiles with water.
@@ -166,7 +171,10 @@ def generate(
     for room in rooms[1:-1]:
         if random.randint(0, 1):
             # gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
-            gm.add_actor(engine.actor.ColdBoltEnemy(*room.center))
+            if level != 3:
+                gm.add_actor(engine.actor.ColdBoltEnemy(*room.center))
+            else:
+                gm.add_actor(engine.actor.AcidBoltEnemy(*room.center))
         else:
             gm.add_actor(engine.actor.HunterEnemy(*room.center))
         engine.rendering.debug_map(gm)

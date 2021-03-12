@@ -237,3 +237,11 @@ class ColdBoltEnemy(Actor):
 
     def default_ai(self) -> engine.actions.Action:
         return engine.actions.RangedIdle(self, effect=engine.effects.Cold(power=1), range=2)
+
+class AcidBoltEnemy(Actor):
+    name = "fire caster"
+    faction = "hostile"
+    ch = "H"
+
+    def default_ai(self) -> engine.actions.Action:
+        return engine.actions.RangedIdle(self, effect=engine.effects.PlaceAcid(power=1), range=1)

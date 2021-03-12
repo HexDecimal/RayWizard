@@ -1,20 +1,39 @@
-name: Package
+name: Publish 7DRL
 
 on:
   push:
-  pull_request:
+    branches:
+      - 7drl
 
 jobs:
   bundle:
     runs-on: ${{ matrix.os }}
+    environment: itch
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-10.15, windows-2019]
+        include:
+          - os: windows-2019
+            channel: windows-x64-7drl
+            butler-url: https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
+          - os: macos-10.15
+            channel: osx-x64-7drl
+            butler-url: https://broth.itch.ovh/butler/darwin-amd64/LATEST/archive/default
+          - os: ubuntu-18.04
+            channel: linux-x64-7drl
+            butler-url: https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: "3.x"
+        python-version: "3.8"
+    - name: Install Butler
+      shell: bash
+      run: |
+        curl -L -o butler.zip ${{ matrix.butler-url }}
+        unzip butler.zip
+        chmod +x butler
+        echo "." >> $GITHUB_PATH
     - name: Install APT dependencies
       if: runner.os == 'Linux'
       run: |
@@ -40,20 +59,9 @@ jobs:
         PYTHONHASHSEED: 42
       run: |
         pyinstaller main.spec
-    - name: List files
-      if: runner.os != 'Windows'
+    - name: Publish to Itch
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      shell: bash
       run: |
-        find dist
-    - name: Tar files
-      if: runner.os != 'Windows'
-      run: |
-        tar --format=ustar -czvf ${{matrix.os}}.tar.gz dist/main
-    - name: Archive files
-      if: runner.os == 'Windows'
-      run: |
-        Compress-Archive dist/main ${{matrix.os}}.zip
-    - name: 'Upload Artifact'
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist
-        path: ${{matrix.os}}.*
+        butler push dist/main hightyrol/raywizard:${{ matrix.channel }}

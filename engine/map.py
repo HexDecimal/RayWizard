@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import collections
-from typing import Deque, NamedTuple, Optional, Set, Tuple, Union
+from typing import Deque, NamedTuple, Optional, Set, Tuple, Type, Union
 
 import numpy as np
 
@@ -91,7 +91,9 @@ class Map:
         """Returns True if `x`,`y` is in bounds of this map."""
         return 0 <= x < self.width and 0 <= y < self.height
 
-    def is_blocked(self, x: int, y: int, actor: Optional[engine.actor.Actor]) -> Union[bool, engine.actor.Actor]:
+    def is_blocked(
+        self, x: int, y: int, actor: Optional[Union[engine.actor.Actor, Type[engine.actor.Actor]]]
+    ) -> Union[bool, engine.actor.Actor]:
         """Returns True if this space can accept a large object such as an Actor."""
         if not self.in_bounds(x, y):
             return True  # Out-of-bounds.

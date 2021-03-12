@@ -130,10 +130,10 @@ class PlaceActor(ActionWithDir):
 
     def perform(self) -> bool:
         xy = self.target_xy
-        if not g.world.map.is_blocked(*xy, None):
+        if not g.world.map.is_blocked(*xy, self.spawn):
             g.world.map.add_actor(self.spawn(*xy))
             return True
-        return False
+        raise StopAction("That position is blocked!")
 
 
 class Beam(ActionWithDir, ActionWithEffect):

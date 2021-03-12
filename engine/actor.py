@@ -27,6 +27,7 @@ class Actor(Schedulable):
     can_walk = True
     can_fly = False
     can_swim = False
+    view_radius: int = 10
 
     def __init__(
         self,
@@ -87,11 +88,17 @@ class Actor(Schedulable):
         recursion.
         """
         visible = tcod.map.compute_fov(
-            transparency=g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
+            transparency=g.world.map.tiles["transparent"],
+            pov=self.xy,
+            algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST,
+            radius=self.view_radius,
         )
         if "earth vision" in self.status:
             visible |= tcod.map.compute_fov(
-                transparency=~g.world.map.tiles["transparent"], pov=self.xy, algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST
+                transparency=~g.world.map.tiles["transparent"],
+                pov=self.xy,
+                algorithm=tcod.FOV_SYMMETRIC_SHADOWCAST,
+                radius=0,
             )
         if plus_shared:
             for actor in g.world.map.actors:

@@ -100,6 +100,8 @@ def generate(
     wallType = engine.tiles.WALL
     waterType = engine.tiles.WATER
 
+    if level == 2:
+        wallType = engine.tiles.ICE_WALL
     if level == 3:
         waterType = engine.tiles.ACID
 

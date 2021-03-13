@@ -47,11 +47,11 @@ jobs:
     - name: Tar files
       if: runner.os != 'Windows'
       run: |
-        tar --format=ustar -czvf ${{matrix.os}}.tar.gz dist/main
+        tar --format=ustar -czvf ${{matrix.os}}.tar.gz dist/RayWizard
     - name: Archive files
       if: runner.os == 'Windows'
       run: |
-        Compress-Archive dist/main ${{matrix.os}}.zip
+        Compress-Archive dist/RayWizard ${{matrix.os}}.zip
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v2
       with:

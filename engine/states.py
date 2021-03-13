@@ -117,3 +117,10 @@ class AskDirection(State):
     def cmd_move(self, x: int, y: int) -> None:
         self.direction = (x, y)
         g.states.pop()
+
+
+class KillScreen(State):
+    """Displayed on the players death."""
+
+    def on_draw(self, console: tcod.console.Console) -> None:
+        engine.rendering.render_main(console)

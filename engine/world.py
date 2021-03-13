@@ -68,4 +68,5 @@ class World:
                             continue
                         if spell.cooldown_left:
                             spell.cooldown_left -= 1
-        logger.info("Player is dead or missing!")
+        self.report("You have died.  Press escape to start over.")
+        engine.states.KillScreen().run_modal()

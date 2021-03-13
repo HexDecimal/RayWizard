@@ -5,11 +5,13 @@ Run this module from Python to start this program.
 """
 from __future__ import annotations  # This may be required to resolve import order issues.
 
+import atexit
 import logging
 import os
 import sys
 import warnings
 
+import pygame
 import tcod
 
 import engine.world
@@ -20,6 +22,13 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 def main() -> None:
     """Main entrypoint."""
+    # Prevent Pygame key repeat interference.
+    pygame.display.init()
+    pygame.display.quit()
+
+    pygame.mixer.init()
+    atexit.register(pygame.mixer.quit)
+
     tileset = tcod.tileset.load_tilesheet("Alloy_curses_12x12.png", 16, 16, tcod.tileset.CHARMAP_CP437)
     with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset, title="RayWizard") as g.context:
         level = 1

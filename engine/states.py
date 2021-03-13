@@ -96,7 +96,7 @@ class InGame(State):
         Help().run_modal()
 
     def cmd_cancel(self) -> None:
-        pass
+        EscapeMenu().run_modal()
 
     def cmd_explore(self) -> None:
         g.world.player.ai = engine.actions.AutoExplore(g.world.player)
@@ -160,4 +160,43 @@ class WinScreen(State):
         )
 
     def cmd_cancel(self) -> None:
+        raise SystemExit()
+
+
+class EscapeMenu(State):
+    def __init__(self) -> None:
+        super().__init__()
+        self.cursor = 0
+        self.menu = (
+            ("Return to game", self.cmd_cancel),
+            ("Quit", self.quit),
+        )
+
+    def on_draw(self, console: tcod.console.Console) -> None:
+        engine.rendering.render_main(console)
+        console.tiles_rgb["fg"] //= 12
+        console.tiles_rgb["bg"] //= 12
+        width, height = 30, 8
+        left = (console.width - width) // 2
+        top = (console.height - height) // 2
+
+        for i, (text, _) in enumerate(self.menu):
+            fg = engine.rendering.TEXT_COLOR
+            bg = None
+            if i == self.cursor:
+                bg = engine.rendering.TEXT_COLOR
+                fg = engine.rendering.BLACK
+            console.print(left, top + i, text, fg=fg, bg=bg)
+
+    def cmd_move(self, x: int, y: int) -> None:
+        if x:
+            return
+        self.cursor = (self.cursor + y) % len(self.menu)
+        if y == 0:
+            self.cmd_confirm()
+
+    def cmd_confirm(self) -> None:
+        self.menu[self.cursor][1]()
+
+    def quit(self) -> None:
         raise SystemExit()

@@ -92,6 +92,9 @@ class State(tcod.event.EventDispatch[None]):
         assert g.states[-1] is self
         g.states.pop()
 
+    def cmd_confirm(self) -> None:
+        pass
+
     def cmd_move(self, x: int, y: int) -> None:
         """Movement command.
 
@@ -139,6 +142,8 @@ class State(tcod.event.EventDispatch[None]):
                 self.cmd_up()
         elif event.sym == tcod.event.K_x and not shift:
             self.cmd_explore()
+        elif event.sym in {tcod.event.K_RETURN, tcod.event.K_KP_ENTER}:
+            self.cmd_confirm()
 
         elif __debug__ and event.sym == tcod.event.K_F2:
             self.debug_regenerate_map()

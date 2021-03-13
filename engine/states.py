@@ -93,6 +93,9 @@ class InGame(State):
     def cmd_help(self) -> None:
         Help().run_modal()
 
+    def cmd_cancel(self) -> None:
+        pass
+
     def cmd_explore(self) -> None:
         g.world.player.ai = engine.actions.AutoExplore(g.world.player)
         g.states.pop()

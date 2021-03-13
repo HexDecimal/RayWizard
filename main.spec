@@ -7,7 +7,7 @@ a = Analysis(
     ["main.py"],
     pathex=["."],
     binaries=[],
-    datas=[("Alloy_curses_12x12.png", ".")],
+    datas=[("Alloy_curses_12x12.png", "."),("7DRL2--HighTyrol", ".")],
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],

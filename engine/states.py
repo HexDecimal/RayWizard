@@ -83,7 +83,14 @@ class InGame(State):
             if not isinstance(obj, engine.features.StairsDown):
                 continue
             g.world.player.hp = 12
-            g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
+            if g.world.map.level + 1 != 4:
+                g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
+            else:
+                # logic for end of the game.
+                g.world.report("Congradulations!")
+                g.world.report("You have escaped your dungeon prison,")
+                g.world.report("and Won the Game!")
+                g.world.report("Now you roam the planet, with your newfound freedom!")
             g.states.pop()
             break
 

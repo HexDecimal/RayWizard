@@ -23,11 +23,11 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="main",
+    name="start_game",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     console=False,
 )
-coll = COLLECT(exe, a.binaries, a.zipfiles, a.datas, strip=False, upx=True, upx_exclude=[], name="main")
+coll = COLLECT(exe, a.binaries, a.zipfiles, a.datas, strip=False, upx=True, upx_exclude=[], name="RayWizard")

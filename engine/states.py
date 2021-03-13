@@ -27,11 +27,13 @@ To move around use the number pad keys, VI keys, or the arrow keys along with ho
  4 5 6  h . l
  1 2 3  b j n
 
-The period key or keypad 5 can be used to wait a turn.
+The period key [.] or [keypad 5] can be used to wait a turn.
 
-The standard numbers (0..9) are used to select spells.
+The standard numbers [0]..[9] are used to select spells.
 
-Press esc to exit this screen and cancel out of other actions.
+[x] Auto-explore.
+[esc] Exit this screen and cancel out of other actions.
+[?] Show this screen.
 """
 
 
@@ -83,12 +85,18 @@ class InGame(State):
             if not isinstance(obj, engine.features.StairsDown):
                 continue
             g.world.player.hp = 12
-            g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
+            if g.world.map.level + 1 != 4:
+                g.world.map = procgen.dungeon.generate(g.world, level=g.world.map.level + 1)
+            else:
+                WinScreen().run_modal()  # logic for the end of the game.
             g.states.pop()
             break
 
     def cmd_help(self) -> None:
         Help().run_modal()
+
+    def cmd_cancel(self) -> None:
+        EscapeMenu().run_modal()
 
     def cmd_explore(self) -> None:
         g.world.player.ai = engine.actions.AutoExplore(g.world.player)
@@ -117,3 +125,78 @@ class AskDirection(State):
     def cmd_move(self, x: int, y: int) -> None:
         self.direction = (x, y)
         g.states.pop()
+
+
+class KillScreen(State):
+    """Displayed on the players death."""
+
+    def on_draw(self, console: tcod.console.Console) -> None:
+        engine.rendering.render_main(console)
+
+
+WIN_TEXT = """\
+Congradulations!
+
+You have escaped your dungeon prison, and Won the Game!
+Now you roam the planet, with your newfound freedom!
+"""
+
+
+class WinScreen(State):
+    """Screen for winning the game."""
+
+    def on_draw(self, console: tcod.console.Console) -> None:
+        console.clear()
+        width, height = 60, 32
+
+        console.print_box(
+            (console.width - width) // 2,
+            (console.height - height) // 2,
+            width,
+            height,
+            WIN_TEXT,
+            fg=engine.rendering.TEXT_COLOR,
+            bg=None,
+        )
+
+    def cmd_cancel(self) -> None:
+        raise SystemExit()
+
+
+class EscapeMenu(State):
+    def __init__(self) -> None:
+        super().__init__()
+        self.cursor = 0
+        self.menu = (
+            ("Return to game", self.cmd_cancel),
+            ("Quit", self.quit),
+        )
+
+    def on_draw(self, console: tcod.console.Console) -> None:
+        engine.rendering.render_main(console)
+        console.tiles_rgb["fg"] //= 12
+        console.tiles_rgb["bg"] //= 12
+        width, height = 30, 8
+        left = (console.width - width) // 2
+        top = (console.height - height) // 2
+
+        for i, (text, _) in enumerate(self.menu):
+            fg = engine.rendering.TEXT_COLOR
+            bg = None
+            if i == self.cursor:
+                bg = engine.rendering.TEXT_COLOR
+                fg = engine.rendering.BLACK
+            console.print(left, top + i, text, fg=fg, bg=bg)
+
+    def cmd_move(self, x: int, y: int) -> None:
+        if x:
+            return
+        self.cursor = (self.cursor + y) % len(self.menu)
+        if y == 0:
+            self.cmd_confirm()
+
+    def cmd_confirm(self) -> None:
+        self.menu[self.cursor][1]()
+
+    def quit(self) -> None:
+        raise SystemExit()

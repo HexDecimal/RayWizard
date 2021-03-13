@@ -21,15 +21,15 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 def main() -> None:
     """Main entrypoint."""
     tileset = tcod.tileset.load_tilesheet("Alloy_curses_12x12.png", 16, 16, tcod.tileset.CHARMAP_CP437)
-    with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset) as g.context:
-        g.world = engine.world.World()
+    with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset, title="RayWizard") as g.context:
         level = 1
         if __debug__:
             level = int(os.environ.get("LEVEL", level))
 
-        g.world.map = procgen.dungeon.generate(g.world, level=level)
-
-        g.world.loop()
+        while True:
+            g.world = engine.world.World()
+            g.world.map = procgen.dungeon.generate(g.world, level=level)
+            g.world.loop()
 
 
 if __name__ == "__main__":

@@ -64,4 +64,4 @@ jobs:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       shell: bash
       run: |
-        butler push dist/main hightyrol/raywizard:${{ matrix.channel }}
+        butler push dist/RayWizard hightyrol/raywizard:${{ matrix.channel }}

@@ -71,10 +71,10 @@ class Actor(Schedulable):
     def apply_effect(self, effect: engine.effects.Effect) -> None:
         """Take damage or trigger side-effects."""
         damage = effect.power  # Placeholder.
-        g.world.report(f"{self.name.title()} takes {damage} damage.")
+        g.world.report(f"{self.name.title()} takes {damage} damage.", visual_xy=self.xy)
         self.hp -= damage
         if self.hp <= 0:
-            g.world.report(f"{self.name.title()} dies.")
+            g.world.report(f"{self.name.title()} dies.", visual_xy=self.xy)
             g.world.map.remove_actor(self)
 
     @property

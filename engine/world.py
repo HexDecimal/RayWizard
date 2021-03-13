@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 import random
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import engine.actor
 import engine.map
@@ -35,8 +35,10 @@ class World:
         self.log: List[str] = []  # Text log.
         self.player = engine.actor.Player(0, 0)
 
-    def report(self, message: str) -> None:
+    def report(self, message: str, visual_xy: Optional[Tuple[int, int]] = None) -> None:
         """Append to the text log."""
+        if visual_xy and not self.player.get_fov()[visual_xy]:
+            return
         logger.info(message)
         self.log.append(message)
 

@@ -127,6 +127,8 @@ def render_slots(console: tcod.console.Console) -> None:
     x = console.width - UI_SIZE[0] + 1
     console.tiles_rgb[x - 1, :] = ord("▒"), BORDER_COLOR, BLACK
     for i, spell in enumerate(g.world.spell_slots):
+        if spell is None:
+            continue  # Skip drawing this slot.
         spell_name = "--------" if spell is None else spell.name
         spell_console = tcod.console.Console(UI_SIZE[0] - 1, 6, order="F")
         spell_console.print(0, 0, f"{i+1:2d}. {spell_name}", fg=TEXT_COLOR, bg=BG)

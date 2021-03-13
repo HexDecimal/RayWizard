@@ -27,8 +27,8 @@ class World:
             engine.spells.Blast(name="Heat blast", cooldown=8, effect=engine.effects.Heat(), range=5),
             engine.spells.PlaceActor(name="Seeking bomb", cooldown=12, spawn=engine.actor.FlyingBomb),
             engine.spells.PlaceActor(name="Create scout", cooldown=24, spawn=engine.actor.Scout),
-            None,
             engine.spells.EarthVision(name="Earth Vision", cooldown=24, length=12),
+            None,
             None,
         ]  # Spells equipped to the hotbar.
         assert len(self.spell_slots) == 10

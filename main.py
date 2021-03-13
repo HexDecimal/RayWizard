@@ -39,7 +39,7 @@ def main() -> None:
 
         while True:
             # Loading the audio file
-            pygame.mixer.music.load('7DRL2--HighTyrol.wav')
+            pygame.mixer.music.load('7DRLTyrol.ogg')
             # Playing the Audio file
             mixer.music.play(-1)
 

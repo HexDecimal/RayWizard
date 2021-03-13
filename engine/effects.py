@@ -6,6 +6,8 @@ import g
 
 
 class Effect:
+    name = "stuff"
+
     def __init__(self, power: int = 5):
         self.power = power
 
@@ -15,6 +17,8 @@ class Effect:
 
 
 class Cold(Effect):
+    name = "ice"
+
     def apply(self, x: int, y: int) -> None:
         super().apply(x, y)
         if g.world.map.tiles[x, y] == engine.tiles.WATER.as_np():
@@ -24,6 +28,8 @@ class Cold(Effect):
 
 
 class Heat(Effect):
+    name = "fire"
+
     def apply(self, x: int, y: int) -> None:
         super().apply(x, y)
         if g.world.map.tiles[x, y] == engine.tiles.ICE_FLOOR.as_np():
@@ -33,12 +39,16 @@ class Heat(Effect):
 
 
 class PlaceAcid(Effect):
+    name = "acid"
+
     def apply(self, x: int, y: int) -> None:
         super().apply(x, y)
         g.world.map.tiles[x, y] = engine.tiles.ACID
 
 
 class Dig(Effect):
+    name = "digging"
+
     def apply(self, x: int, y: int) -> None:
         super().apply(x, y)
         if g.world.map.tiles[x, y] == engine.tiles.WALL.as_np():

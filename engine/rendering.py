@@ -132,9 +132,7 @@ def render_slots(console: tcod.console.Console) -> None:
         spell_console.print(0, 0, f"{i+1:2d}. {spell_name}", fg=TEXT_COLOR, bg=BG)
         if spell is not None:
             spell_console.print(0, 1, f"Cooldown: {spell.cooldown_left}/{spell.cooldown_length}", fg=TEXT_COLOR, bg=BG)
-            spell_console.print_box(0, 3, 0, 0, spell.desc, fg=TEXT_UNIMPORTANT, bg=BG)
-
-        spell_console.print(spell_console.width - 3, spell_console.height - 1, "^^^", fg=TEXT_COLOR, bg=BG)
+            spell_console.print_box(0, 2, 0, 0, spell.desc, fg=TEXT_UNIMPORTANT, bg=BG)
 
         spell_console.blit(console, x, i * 6)
 

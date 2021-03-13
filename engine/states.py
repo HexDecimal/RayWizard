@@ -27,11 +27,13 @@ To move around use the number pad keys, VI keys, or the arrow keys along with ho
  4 5 6  h . l
  1 2 3  b j n
 
-The period key or keypad 5 can be used to wait a turn.
+The period key [.] or [keypad 5] can be used to wait a turn.
 
-The standard numbers (0..9) are used to select spells.
+The standard numbers [0]..[9] are used to select spells.
 
-Press esc to exit this screen and cancel out of other actions.
+[x] Auto-explore.
+[esc] Exit this screen and cancel out of other actions.
+[?] Show this screen.
 """
 
 

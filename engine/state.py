@@ -129,7 +129,7 @@ class State(tcod.event.EventDispatch[None]):
             self.cmd_down()
         elif event.sym == tcod.event.K_COMMA and shift:
             self.cmd_up()
-        elif event.sym == tcod.event.K_SLASH and shift or event.sym == tcod.event.K_F1 and not shift:
+        elif event.sym == tcod.event.K_SLASH or event.sym == tcod.event.K_F1 and not shift:
             self.cmd_help()
         elif event.scancode == tcod.event.SCANCODE_NONUSBACKSLASH:
             # Handle non-US keyboards.

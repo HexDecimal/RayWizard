@@ -1,4 +1,4 @@
-name: Package
+name: Test Deployment
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
       run: |
         pyinstaller main.spec
     - name: List files
-      if: runner.os != 'Windows'
+      shell: bash
       run: |
         find dist
     - name: Tar files
@@ -57,3 +57,4 @@ jobs:
       with:
         name: dist
         path: ${{matrix.os}}.*
+        retention-days: 5

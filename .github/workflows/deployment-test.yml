@@ -33,7 +33,7 @@ jobs:
     - name: Install Pip packages
       run: |
         python -m pip install -U pip wheel
-        pip install --requirement requirements.txt pyinstaller
+        pip install --requirement requirements.txt
     - name: Run PyInstaller
       env:
         PYTHONOPTIMIZE: 1

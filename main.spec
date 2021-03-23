@@ -8,7 +8,9 @@ a = Analysis(
     pathex=["."],
     binaries=[],
     datas=[("Alloy_curses_12x12.png", ".")],
-    hiddenimports=[],
+    hiddenimports=[
+        "scipy.spatial.transform._rotation_groups",  # Fix 'PyInstaller < 4.2'
+    ],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],

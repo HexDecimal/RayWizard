@@ -14,6 +14,7 @@ jobs:
         python-version: "3.x"
     - name: Install APT dependencies
       run: |
+        sudo apt-get update
         sudo apt-get install libsdl2-dev
     - name: Get pip cache dir
       id: pip-cache

@@ -6,11 +6,11 @@ from typing import Optional, Tuple
 import numpy as np
 import tcod
 
+from engine.state import State  # Import-time requirement, so `from x import Y` is used.
 import engine.actions
 import engine.rendering
 import g
 import procgen.dungeon
-from engine.state import State  # Import-time requirement, so `from x import Y` is used.
 
 
 class HelloWorld(State):

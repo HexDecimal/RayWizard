@@ -4,14 +4,14 @@ Handles rendering frames between player actions.
 """
 from __future__ import annotations
 
-import time
 from typing import Sequence
+import time
 
 import tcod
 
+from constants import CONSOLE_HEIGHT, CONSOLE_WIDTH
 import engine.rendering
 import g
-from constants import CONSOLE_HEIGHT, CONSOLE_WIDTH
 
 
 def events_in_queue() -> bool:

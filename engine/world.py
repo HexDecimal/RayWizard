@@ -1,9 +1,9 @@
 """World class module."""
 from __future__ import annotations
 
+from typing import List, Optional, Tuple
 import logging
 import random
-from typing import List, Optional, Tuple
 
 import engine.actor
 import engine.map

@@ -1,18 +1,17 @@
 """Collections of actions."""
 from __future__ import annotations
 
-import logging
 from typing import Any, Iterator, List, Optional, Tuple, Type
+import logging
 
 import tcod
 
 import engine.actor
 import engine.animation
+import engine.effects
 import engine.states
 import engine.tiles
 import g
-
-import engine.effects  # Must be imported after engine.tiles.  # isort:skip
 
 logger = logging.getLogger(__name__)
 

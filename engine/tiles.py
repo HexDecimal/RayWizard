@@ -4,8 +4,8 @@ from typing import NamedTuple, Optional, Tuple
 
 import numpy as np
 
-import engine.effects
 from engine.effects import Effect
+import engine.effects
 
 tile_graphic = np.dtype([("ch", np.int32), ("fg", "3B"), ("bg", "3B")])
 

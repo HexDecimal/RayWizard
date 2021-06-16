@@ -1,17 +1,17 @@
 """Actor class module"""
 from __future__ import annotations
 
-import logging
 from typing import Dict, Optional, Tuple
+import logging
 
 import numpy as np
 import tcod
 
+from engine.sched import Schedulable
 import engine.actions
 import engine.map
 import engine.states
 import g
-from engine.sched import Schedulable
 
 logger = logging.getLogger(__name__)
 

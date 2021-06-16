@@ -1,8 +1,8 @@
 """Dungeon level generator."""
 from __future__ import annotations
 
-import random
 from typing import Iterator, List, Tuple
+import random
 
 import numpy as np
 import scipy.signal  # type: ignore

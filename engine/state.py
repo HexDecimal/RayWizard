@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import tcod
 
-import g
 from constants import CONSOLE_HEIGHT, CONSOLE_WIDTH
+import g
 
 MOVE_KEYS = {
     # Arrow keys.

@@ -1,16 +1,16 @@
 """Map class module."""
 from __future__ import annotations
 
-import collections
 from typing import Deque, NamedTuple, Optional, Set, Tuple, Type, Union
+import collections
 
 import numpy as np
 
+from engine.tiles import TILE_DT
 import engine.actor
 import engine.features
 import engine.sched
 import engine.tiles
-from engine.tiles import TILE_DT
 
 
 class Camera(NamedTuple):

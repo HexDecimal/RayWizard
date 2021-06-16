@@ -1,15 +1,15 @@
 """Rendering functions."""
 from __future__ import annotations
 
-import time
 from typing import Iterable, Optional, Tuple
+import time
 
 import numpy as np
 import tcod
 
+from engine.tiles import tile_graphic
 import engine.map
 import g
-from engine.tiles import tile_graphic
 
 UI_SIZE = (24, 12)  # Area reserved for the UI.
 

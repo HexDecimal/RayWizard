@@ -12,10 +12,10 @@ import warnings
 
 import tcod
 
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 import engine.world
 import g
 import procgen.dungeon
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 def main() -> None:

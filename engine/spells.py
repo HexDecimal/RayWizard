@@ -1,8 +1,8 @@
 """The collection of player spells."""
 from __future__ import annotations
 
-import warnings
 from typing import Any, Optional, Type
+import warnings
 
 import engine.actions
 import engine.actor

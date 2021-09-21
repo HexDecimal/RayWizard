@@ -9,6 +9,7 @@ import tcod
 from engine.state import State  # Import-time requirement, so `from x import Y` is used.
 import engine.actions
 import engine.rendering
+import engine.save
 import g
 import procgen.dungeon
 
@@ -199,4 +200,5 @@ class EscapeMenu(State):
         self.menu[self.cursor][1]()
 
     def quit(self) -> None:
+        engine.save.save()
         raise SystemExit()

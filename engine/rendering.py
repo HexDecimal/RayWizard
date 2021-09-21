@@ -182,3 +182,17 @@ def print_extra_text(console: tcod.console.Console, message: str) -> None:
     I'm not sure how this should be handled.
     """
     console.print(0, console.height - UI_SIZE[1] - 1, message, fg=TEXT_COLOR, bg=BG)
+
+
+# I want to add a function which renders a main menu whith an option to start a new game or load a save game.
+# perhaps inclue help as well
+# Ideally it would be extnedable to all things we might want to add to it later.
+# And include a nice title.
+# Also needs logic in main to start the main game logic after the menu.
+# def render_main_menu() -> None:
+#
+
+# I want to add an interactive popup renderer? Probably make a popup object as well as the function to render it.
+# Might be reusable as a crude main menu?
+# The main applications is warning notices for dangerous terrain.
+# Pits, lava, detected traps, etc.

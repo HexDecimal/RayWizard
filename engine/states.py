@@ -200,5 +200,5 @@ class EscapeMenu(State):
         self.menu[self.cursor][1]()
 
     def quit(self) -> None:
-        engine.save.save()
+        engine.save.save()  # Saves on Quit
         raise SystemExit()

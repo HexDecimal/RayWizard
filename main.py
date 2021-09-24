@@ -48,6 +48,17 @@ background_image = tcod.image.load("menu_background.png")[:, :, :3]
 class MainMenu(State):
     """Handle the main menu rendering and input."""
 
+    # Handles the input options and maps them on the menu to functions.
+    def __init__(self) -> None:
+        super().__init__()
+        self.cursor = 0
+        self.menu = (
+            ("Continue last game",),
+            ("Play a new game",),
+            ("Quit", self.quit),
+        )
+
+    # draws the UI elements.
     def on_draw(self, console: tcod.Console) -> None:
         """Render the main menu on a background image."""
         console.draw_semigraphics(background_image, 0, 0)
@@ -67,17 +78,18 @@ class MainMenu(State):
             alignment=tcod.CENTER,
         )
 
-        menu_width = 24
-        for i, text in enumerate(["[N] Play a new game", "[C] Continue last game", "[Q] Quit"]):
-            console.print(
-                console.width // 2,
-                console.height // 2 - 2 + i,
-                text.ljust(menu_width),
-                fg=(255, 255, 255),
-                bg=(0, 0, 0),
-                alignment=tcod.CENTER,
-                bg_blend=tcod.BKGND_ALPHA(64),
-            )
-
         # states.InGame
         return None
+
+    def cmd_move(self, x: int, y: int) -> None:
+        if x:
+            return
+        self.cursor = (self.cursor + y) % len(self.menu)
+        if y == 0:
+            self.cmd_confirm()
+
+    def cmd_confirm(self) -> None:
+        self.menu[self.cursor][1]()
+
+    def quit(self) -> None:
+        raise SystemExit()

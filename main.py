@@ -14,6 +14,7 @@ import tcod
 
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from engine.state import State  # Import-time requirement, so `from x import Y` is used.
+import engine.save
 import engine.world
 import g
 import procgen.dungeon
@@ -29,8 +30,7 @@ def main() -> None:
             level = int(os.environ.get("LEVEL", level))
 
         while True:
-            g.world = engine.world.World()
-            g.world.map = procgen.dungeon.generate(g.world, level=level)
+            MainMenu().run_modal()
             g.world.loop()
 
 
@@ -53,8 +53,8 @@ class MainMenu(State):
         super().__init__()
         self.cursor = 0
         self.menu = (
-            ("Continue last game",),
-            ("Play a new game",),
+            ("Play a new game", self.playNew),
+            ("Continue last game", self.load),
             ("Quit", self.quit),
         )
 
@@ -93,3 +93,10 @@ class MainMenu(State):
 
     def quit(self) -> None:
         raise SystemExit()
+
+    def playNew(self) -> None:
+        g.world = engine.world.World()
+        g.world.map = procgen.dungeon.generate(g.world, level=level)
+
+    def load(self) -> None:
+        engine.save.load()

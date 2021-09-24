@@ -43,6 +43,18 @@ class MainMenu(State):
             alignment=tcod.CENTER,
         )
 
+        menu_width = 24
+        for i, text in enumerate(["Play a new game", "Continue last game", "Quit"]):
+            console.print(
+                console.width // 2,
+                console.height // 2 - 2 + i,
+                text.ljust(menu_width),
+                fg=(255, 255, 255),
+                bg=(0, 0, 0),
+                alignment=tcod.CENTER,
+                bg_blend=tcod.BKGND_ALPHA(64),
+            )
+
         # states.InGame
         return None
 

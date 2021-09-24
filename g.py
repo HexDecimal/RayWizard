@@ -4,12 +4,13 @@ This is for organization and has no special effects.
 """
 from __future__ import annotations
 
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import tcod
 
-import engine.state
-import engine.world
+if TYPE_CHECKING:
+    import engine.state
+    import engine.world
 
 context: tcod.context.Context  # The active context.
 states: List[engine.state.State] = []  # A stack of states, with the last item being the active state.

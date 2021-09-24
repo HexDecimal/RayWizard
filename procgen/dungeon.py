@@ -189,6 +189,7 @@ def generate(
     gm.add_actor(model.player)
     engine.rendering.debug_map(gm)
 
+    # Adds stairs
     gm.add_feature(engine.features.StairsDown(*rooms[-1].center))
     gm.tiles[rooms[-1].center] = engine.tiles.FLOOR
     engine.rendering.debug_map(gm)

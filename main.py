@@ -13,6 +13,7 @@ import warnings
 import tcod
 
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
+from engine.state import State  # Import-time requirement, so `from x import Y` is used.
 import engine.world
 import g
 import procgen.dungeon
@@ -44,10 +45,10 @@ if __name__ == "__main__":
 background_image = tcod.image.load("menu_background.png")[:, :, :3]
 
 
-class MainMenu(input_handlers.BaseEventHandler):
+class MainMenu(State):
     """Handle the main menu rendering and input."""
 
-    def on_render(self, console: tcod.Console) -> None:
+    def on_draw(self, console: tcod.Console) -> None:
         """Render the main menu on a background image."""
         console.draw_semigraphics(background_image, 0, 0)
 
@@ -78,15 +79,5 @@ class MainMenu(input_handlers.BaseEventHandler):
                 bg_blend=tcod.BKGND_ALPHA(64),
             )
 
-    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[input_handlers.BaseEventHandler]:
-        if event.sym in (tcod.event.K_q, tcod.event.K_ESCAPE):
-            raise SystemExit()
-        elif event.sym == tcod.event.K_c:
-            # TODO: Load the game here
-            pass
-        elif event.sym == tcod.event.K_n:
-            return states.InGame(
-                new_game()
-            )  # input_handlers.MainGameEventHandler Is equivelent to states.InGame  in function but the latter is needed for my code
-
+        # states.InGame
         return None

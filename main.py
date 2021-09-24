@@ -39,6 +39,10 @@ if __name__ == "__main__":
     main()
 
 
+# Load the background image and remove the alpha channel.
+background_image = tcod.image.load("menu_background.png")[:, :, :3]
+
+
 class MainMenu(input_handlers.BaseEventHandler):
     """Handle the main menu rendering and input."""
 
@@ -50,14 +54,14 @@ class MainMenu(input_handlers.BaseEventHandler):
             console.width // 2,
             console.height // 2 - 4,
             "TOMBS OF THE ANCIENT KINGS",
-            fg=color.menu_title,
+            fg=(255, 255, 63),
             alignment=tcod.CENTER,
         )
         console.print(
             console.width // 2,
             console.height - 2,
             "By (Your name here)",
-            fg=color.menu_title,
+            fg=(255, 255, 63),
             alignment=tcod.CENTER,
         )
 
@@ -67,8 +71,8 @@ class MainMenu(input_handlers.BaseEventHandler):
                 console.width // 2,
                 console.height // 2 - 2 + i,
                 text.ljust(menu_width),
-                fg=color.menu_text,
-                bg=color.black,
+                fg=(255, 255, 255),
+                bg=(0, 0, 0),
                 alignment=tcod.CENTER,
                 bg_blend=tcod.BKGND_ALPHA(64),
             )

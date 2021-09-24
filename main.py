@@ -37,3 +37,49 @@ if __name__ == "__main__":
         warnings.simplefilter("default")  # Enable all runtime warnings.
     logging.basicConfig(level=logging.INFO)
     main()
+
+
+class MainMenu(input_handlers.BaseEventHandler):
+    """Handle the main menu rendering and input."""
+
+    def on_render(self, console: tcod.Console) -> None:
+        """Render the main menu on a background image."""
+        console.draw_semigraphics(background_image, 0, 0)
+
+        console.print(
+            console.width // 2,
+            console.height // 2 - 4,
+            "TOMBS OF THE ANCIENT KINGS",
+            fg=color.menu_title,
+            alignment=tcod.CENTER,
+        )
+        console.print(
+            console.width // 2,
+            console.height - 2,
+            "By (Your name here)",
+            fg=color.menu_title,
+            alignment=tcod.CENTER,
+        )
+
+        menu_width = 24
+        for i, text in enumerate(["[N] Play a new game", "[C] Continue last game", "[Q] Quit"]):
+            console.print(
+                console.width // 2,
+                console.height // 2 - 2 + i,
+                text.ljust(menu_width),
+                fg=color.menu_text,
+                bg=color.black,
+                alignment=tcod.CENTER,
+                bg_blend=tcod.BKGND_ALPHA(64),
+            )
+
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[input_handlers.BaseEventHandler]:
+        if event.sym in (tcod.event.K_q, tcod.event.K_ESCAPE):
+            raise SystemExit()
+        elif event.sym == tcod.event.K_c:
+            # TODO: Load the game here
+            pass
+        elif event.sym == tcod.event.K_n:
+            return input_handlers.MainGameEventHandler(new_game())
+
+        return None

@@ -30,11 +30,37 @@ class MainMenu(State):
 
         console.print(
             console.width // 2,
-            console.height // 2 - 4,
+            console.height // 10 - 4,
             "RayWizard",
             fg=(255, 255, 63),
             alignment=tcod.CENTER,
         )
+
+        # menu_width = 100
+        """
+        for i, text in enumerate(
+            [
+                ".s5SSSs.                    .s s.  s.                                              ",
+                "      SS. .s5SSSs.  .s5 s.     SS. SS. s.  .s5SSSSs. .s5SSSs.  .s5SSSs.  .s5SSSs.  ",
+                "sS    S%S       SS.     SS. sS S%S S%S SS.       SSS       SS.       SS.       SS. ",
+                "SS    S%S sS    S%S ssS SSS SS S%S S%S S%S     sSSS  sS    S%S sS    S%S sS    S%S ",
+                "SS .sS;:' SSSs. S%S  SSSSS  SS S%S S%S S%S    sSS'   SSSs. S%S SS .sS;:' SS    S%S ",
+                "SS    `:; SS    `:;   `:;   SS `:; `:; `:;  sSS      SS    `:; SS    `:; SS    `:; ",
+                "SS    ;,. SS    ;,.   ;,.   SS ;,. ;,. ;,. sSS       SS    ;,. SS    ;,. SS    ;,. ",
+                "`:    ;:' :;    ;:'   ;:'   `:;;:'`::' ;:' `:;;;;;:' :;    ;:' `:    ;:' ;;;;;;;:' ",
+            ]
+        ):
+            console.print(
+                console.width // 2,
+                console.height // 2 - 2 + i,
+                text,
+                fg=(255, 255, 63),
+                # bg=(0, 0, 0),
+                alignment=tcod.CENTER,
+                bg_blend=tcod.BKGND_ALPHA(64),
+            )
+        """
+
         console.print(
             console.width // 2,
             console.height - 2,
@@ -50,7 +76,7 @@ class MainMenu(State):
                 console.height // 2 - 2 + i,
                 text.ljust(menu_width),
                 fg=(255, 255, 255),
-                bg=(0, 0, 0),
+                # bg=(0, 0, 0),
                 alignment=tcod.CENTER,
                 bg_blend=tcod.BKGND_ALPHA(64),
             )

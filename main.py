@@ -22,6 +22,7 @@ def main() -> None:
     """Main entrypoint."""
     tileset = tcod.tileset.load_tilesheet("Alloy_curses_12x12.png", 16, 16, tcod.tileset.CHARMAP_CP437)
     with tcod.context.new(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, tileset=tileset, title="RayWizard") as g.context:
+        # call main menu function here?
         level = 1
         if __debug__:
             level = int(os.environ.get("LEVEL", level))
@@ -84,6 +85,8 @@ class MainMenu(input_handlers.BaseEventHandler):
             # TODO: Load the game here
             pass
         elif event.sym == tcod.event.K_n:
-            return input_handlers.MainGameEventHandler(new_game())
+            return states.InGame(
+                new_game()
+            )  # input_handlers.MainGameEventHandler Is equivelent to states.InGame  in function but the latter is needed for my code
 
         return None

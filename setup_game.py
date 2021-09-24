@@ -30,7 +30,7 @@ class MainMenu(State):
 
         console.print(
             console.width // 2,
-            console.height // 10 - 4,
+            console.height // 2 - 4,
             "RayWizard",
             fg=(255, 255, 63),
             alignment=tcod.CENTER,
@@ -40,14 +40,10 @@ class MainMenu(State):
         """
         for i, text in enumerate(
             [
-                ".s5SSSs.                    .s s.  s.                                              ",
-                "      SS. .s5SSSs.  .s5 s.     SS. SS. s.  .s5SSSSs. .s5SSSs.  .s5SSSs.  .s5SSSs.  ",
-                "sS    S%S       SS.     SS. sS S%S S%S SS.       SSS       SS.       SS.       SS. ",
-                "SS    S%S sS    S%S ssS SSS SS S%S S%S S%S     sSSS  sS    S%S sS    S%S sS    S%S ",
-                "SS .sS;:' SSSs. S%S  SSSSS  SS S%S S%S S%S    sSS'   SSSs. S%S SS .sS;:' SS    S%S ",
-                "SS    `:; SS    `:;   `:;   SS `:; `:; `:;  sSS      SS    `:; SS    `:; SS    `:; ",
-                "SS    ;,. SS    ;,.   ;,.   SS ;,. ;,. ;,. sSS       SS    ;,. SS    ;,. SS    ;,. ",
-                "`:    ;:' :;    ;:'   ;:'   `:;;:'`::' ;:' `:;;;;;:' :;    ;:' `:    ;:' ;;;;;;;:' ",
+                " ____,   ____, _  _,  _   _, __,   ___,    ____, ____,  ____,  ",
+                "(-|__)  (-/_| (-\_/  (-|  | (-|   (- /    (-/_| (-|__) (-|  \  ",
+                " _|  \, _/  |,  _|,   _|/\|, _|_,  _/__,  _/  |, _|  \, _|__/  ",
+                "(      (       (     (      (     (      (      (      (       ",
             ]
         ):
             console.print(

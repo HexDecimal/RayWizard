@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any, Iterator, List, Optional, Tuple, Type
 import logging
 
+import numpy as np
 import tcod
 
 import engine.actor
@@ -208,6 +209,22 @@ class Pathfind(Action):
             return True
         self.path = []
         return False
+
+
+"""
+class findPathAsLocations(Pathfind):
+
+    def return_path() -> np.ndarray:
+
+        check = True
+        locationArray = np.empty((width, height), int, order="F")
+
+        while(check == True):
+            if not self.path:
+            return False
+            next_x, next_y = self.path.pop()
+            locationArray(next_x, next_y)
+"""
 
 
 class RandomPatrol(Action):

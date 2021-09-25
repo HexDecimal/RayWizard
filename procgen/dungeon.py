@@ -168,6 +168,7 @@ def generate(
     engine.rendering.debug_map(gm)
 
     # Add actors to rooms.
+    # May move this after adding the down stair for better
     for room in rooms[1:-1]:
         if random.randint(0, 1):
             # gm.add_actor(engine.actor.Actor(*room.center)) #placeholder enemies.
@@ -193,5 +194,12 @@ def generate(
     gm.add_feature(engine.features.StairsDown(*rooms[-1].center))
     gm.tiles[rooms[-1].center] = engine.tiles.FLOOR
     engine.rendering.debug_map(gm)
+
+    # We could make stair placement based on furthest point?
+
+    # Simpler would just be to calculate fastest path to exit. And use as a guide for placing stuff.
+    # Plug into a dijski map.
+
+    # rooms[0].center to rooms[-1].center
 
     return gm
